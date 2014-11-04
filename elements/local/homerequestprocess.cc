@@ -23,7 +23,7 @@ int HomeRequestProcess::configure(Vector<String> &conf, ErrorHandler *errh) {
 WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req) {
     //TODO IMPLEMENT
     int packetsize = sizeof(RegistrationReply);
-    int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_icmp) + sizeof(click_ether);
+    int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
     WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
     if (packet == 0) click_chatter("cannot make packet!");
     memset(packet->data(), 0, packet->length());
@@ -33,8 +33,8 @@ WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req) {
     format->lifetime = htons(300);
     format->home_address = req->home_address;
     format->home_agent = req->home_agent;
-    format->identification[0] = req->identification[0];
-    format->identification[1] = req->identification[1];
+    format->identification[0] = htonl(req->identification[0]);
+    format->identification[1] = htonl(req->identification[1]);
     return packet;
 }
 

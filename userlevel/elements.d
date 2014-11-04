@@ -249,6 +249,31 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
  ../elements/ip/lineariplookup.hh ../elements/standard/randomswitch.hh \
  ../elements/ip/setrandipaddress.hh ../elements/icmp/icmpipencap.hh \
  ../elements/analysis/aggcounter.hh ../elements/analysis/timerange.hh \
+ ../elements/local/visitorlist.hh /usr/include/c++/4.8/vector \
+ /usr/include/c++/4.8/bits/stl_algobase.h \
+ /usr/include/c++/4.8/bits/functexcept.h \
+ /usr/include/c++/4.8/bits/exception_defines.h \
+ /usr/include/c++/4.8/bits/cpp_type_traits.h \
+ /usr/include/c++/4.8/ext/type_traits.h \
+ /usr/include/c++/4.8/ext/numeric_traits.h \
+ /usr/include/c++/4.8/bits/stl_pair.h /usr/include/c++/4.8/bits/move.h \
+ /usr/include/c++/4.8/bits/concept_check.h \
+ /usr/include/c++/4.8/bits/stl_iterator_base_types.h \
+ /usr/include/c++/4.8/bits/stl_iterator_base_funcs.h \
+ /usr/include/c++/4.8/debug/debug.h \
+ /usr/include/c++/4.8/bits/stl_iterator.h \
+ /usr/include/c++/4.8/bits/allocator.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
+ /usr/include/c++/4.8/ext/new_allocator.h \
+ /usr/include/c++/4.8/bits/memoryfwd.h \
+ /usr/include/c++/4.8/bits/stl_construct.h \
+ /usr/include/c++/4.8/ext/alloc_traits.h \
+ /usr/include/c++/4.8/bits/stl_uninitialized.h \
+ /usr/include/c++/4.8/bits/stl_vector.h \
+ /usr/include/c++/4.8/bits/stl_bvector.h \
+ /usr/include/c++/4.8/bits/range_access.h \
+ /usr/include/c++/4.8/bits/vector.tcc \
+ ../elements/local/visitorlistentry.hh \
  ../elements/analysis/storetimestamp.hh \
  ../elements/tcpudp/checktcpheader.hh ../elements/ip/setipaddress.hh \
  ../elements/test/neighborhoodtest.hh ../elements/simple/simpleidle.hh \
@@ -301,7 +326,9 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
  ../elements/etherswitch/debugbridge.hh ../elements/tcpudp/udprewriter.hh \
  ../elements/standard/rrswitch.hh ../elements/ip/ipratemon.hh \
  ../include/click/packet_anno.hh ../elements/ethernet/ensureether.hh \
- ../elements/userlevel/kerneltun.hh ../elements/analysis/fromnlanrdump.hh \
+ ../elements/userlevel/kerneltun.hh \
+ ../elements/local/foreignreplyprocess.hh \
+ ../elements/analysis/fromnlanrdump.hh \
  ../elements/analysis/aggregatefilter.hh \
  ../elements/userlevel/torawsocket.hh ../elements/test/packettest.hh \
  ../elements/test/tokenbuckettest.hh ../elements/standard/stridesched.hh \
@@ -1082,6 +1109,60 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
 
 ../elements/analysis/timerange.hh:
 
+../elements/local/visitorlist.hh:
+
+/usr/include/c++/4.8/vector:
+
+/usr/include/c++/4.8/bits/stl_algobase.h:
+
+/usr/include/c++/4.8/bits/functexcept.h:
+
+/usr/include/c++/4.8/bits/exception_defines.h:
+
+/usr/include/c++/4.8/bits/cpp_type_traits.h:
+
+/usr/include/c++/4.8/ext/type_traits.h:
+
+/usr/include/c++/4.8/ext/numeric_traits.h:
+
+/usr/include/c++/4.8/bits/stl_pair.h:
+
+/usr/include/c++/4.8/bits/move.h:
+
+/usr/include/c++/4.8/bits/concept_check.h:
+
+/usr/include/c++/4.8/bits/stl_iterator_base_types.h:
+
+/usr/include/c++/4.8/bits/stl_iterator_base_funcs.h:
+
+/usr/include/c++/4.8/debug/debug.h:
+
+/usr/include/c++/4.8/bits/stl_iterator.h:
+
+/usr/include/c++/4.8/bits/allocator.h:
+
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
+
+/usr/include/c++/4.8/ext/new_allocator.h:
+
+/usr/include/c++/4.8/bits/memoryfwd.h:
+
+/usr/include/c++/4.8/bits/stl_construct.h:
+
+/usr/include/c++/4.8/ext/alloc_traits.h:
+
+/usr/include/c++/4.8/bits/stl_uninitialized.h:
+
+/usr/include/c++/4.8/bits/stl_vector.h:
+
+/usr/include/c++/4.8/bits/stl_bvector.h:
+
+/usr/include/c++/4.8/bits/range_access.h:
+
+/usr/include/c++/4.8/bits/vector.tcc:
+
+../elements/local/visitorlistentry.hh:
+
 ../elements/analysis/storetimestamp.hh:
 
 ../elements/tcpudp/checktcpheader.hh:
@@ -1259,6 +1340,8 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
 ../elements/ethernet/ensureether.hh:
 
 ../elements/userlevel/kerneltun.hh:
+
+../elements/local/foreignreplyprocess.hh:
 
 ../elements/analysis/fromnlanrdump.hh:
 
