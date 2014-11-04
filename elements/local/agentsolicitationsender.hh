@@ -7,6 +7,7 @@
 #include "icmpagentsolicitation.hh"
 CLICK_DECLS
 
+
 class AgentSolicitationSender : public Element { 
 	public:
 		AgentSolicitationSender();
