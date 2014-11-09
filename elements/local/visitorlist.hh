@@ -1,7 +1,7 @@
 #ifndef VISITORLIST_HH_
 #define VISITORLIST_HH_
 
-#include <vector>
+#include <list>
 #include <click/element.hh>
 #include <clicknet/udp.h>
 #include <clicknet/icmp.h>
@@ -24,10 +24,12 @@ class VisitorList : public Element {
         VisitorListEntry* getEntry(uint32_t);
         void insertEntry(VisitorListEntry*);
         void deleteEntry(VisitorListEntry*);
+        void printList();
 
         void push(int, Packet *);
     private:
-        std::vector<VisitorListEntry*> visList;
+        std::list<VisitorListEntry*> visList;
+
 
 
 };

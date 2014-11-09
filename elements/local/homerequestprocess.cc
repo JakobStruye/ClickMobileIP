@@ -30,7 +30,7 @@ WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req) {
     RegistrationReply* format = (RegistrationReply*) packet->data();
     format->type = 3; //fixed
     format->code = 1;
-    format->lifetime = htons(300);
+    format->lifetime = 300;
     format->home_address = req->home_address;
     format->home_agent = req->home_agent;
     format->identification[0] = htonl(req->identification[0]);

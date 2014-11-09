@@ -68,7 +68,7 @@ visitorlist.o: ../elements/local/visitorlist.cc \
  /usr/include/x86_64-linux-gnu/bits/socket2.h /usr/include/netinet/in.h \
  /usr/include/x86_64-linux-gnu/bits/in.h \
  /usr/include/x86_64-linux-gnu/sys/time.h ../include/click/error.hh \
- ../elements/local/visitorlist.hh /usr/include/c++/4.8/vector \
+ ../elements/local/visitorlist.hh /usr/include/c++/4.8/list \
  /usr/include/c++/4.8/bits/stl_algobase.h \
  /usr/include/c++/4.8/bits/functexcept.h \
  /usr/include/c++/4.8/bits/exception_defines.h \
@@ -85,18 +85,14 @@ visitorlist.o: ../elements/local/visitorlist.cc \
  /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
  /usr/include/c++/4.8/ext/new_allocator.h \
  /usr/include/c++/4.8/bits/memoryfwd.h \
- /usr/include/c++/4.8/bits/stl_construct.h \
- /usr/include/c++/4.8/ext/alloc_traits.h \
- /usr/include/c++/4.8/bits/stl_uninitialized.h \
- /usr/include/c++/4.8/bits/stl_vector.h \
- /usr/include/c++/4.8/bits/stl_bvector.h \
  /usr/include/c++/4.8/bits/range_access.h \
- /usr/include/c++/4.8/bits/vector.tcc ../include/click/element.hh \
- ../include/click/packet.hh ../include/click/ipaddress.hh \
- ../include/click/type_traits.hh ../include/clicknet/ip.h \
- ../include/click/cxxprotect.h ../include/click/cxxunprotect.h \
- ../include/click/timestamp.hh ../include/click/integers.hh \
- /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/huge_val.h \
+ /usr/include/c++/4.8/bits/stl_list.h /usr/include/c++/4.8/bits/list.tcc \
+ ../include/click/element.hh ../include/click/packet.hh \
+ ../include/click/ipaddress.hh ../include/click/type_traits.hh \
+ ../include/clicknet/ip.h ../include/click/cxxprotect.h \
+ ../include/click/cxxunprotect.h ../include/click/timestamp.hh \
+ ../include/click/integers.hh /usr/include/math.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_val.h \
  /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
  /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
  /usr/include/x86_64-linux-gnu/bits/inf.h \
@@ -332,7 +328,7 @@ visitorlist.o: ../elements/local/visitorlist.cc \
 
 ../elements/local/visitorlist.hh:
 
-/usr/include/c++/4.8/vector:
+/usr/include/c++/4.8/list:
 
 /usr/include/c++/4.8/bits/stl_algobase.h:
 
@@ -368,19 +364,11 @@ visitorlist.o: ../elements/local/visitorlist.cc \
 
 /usr/include/c++/4.8/bits/memoryfwd.h:
 
-/usr/include/c++/4.8/bits/stl_construct.h:
-
-/usr/include/c++/4.8/ext/alloc_traits.h:
-
-/usr/include/c++/4.8/bits/stl_uninitialized.h:
-
-/usr/include/c++/4.8/bits/stl_vector.h:
-
-/usr/include/c++/4.8/bits/stl_bvector.h:
-
 /usr/include/c++/4.8/bits/range_access.h:
 
-/usr/include/c++/4.8/bits/vector.tcc:
+/usr/include/c++/4.8/bits/stl_list.h:
+
+/usr/include/c++/4.8/bits/list.tcc:
 
 ../include/click/element.hh:
 

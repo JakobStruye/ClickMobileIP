@@ -1,0 +1,119 @@
+#include <click/config.h>
+#include <click/confparse.hh>
+#include <click/error.hh>
+#include "mobilitybindinglist.hh"
+#include <iostream>
+#include <cmath>
+
+CLICK_DECLS
+MobilityBindingList::MobilityBindingList(){
+    mobilityList = std::list<MobilityBindingListEntry*>();
+
+}
+
+MobilityBindingList::~ MobilityBindingList()
+{}
+
+int MobilityBindingList::configure(Vector<String> &conf, ErrorHandler *errh) {
+    if (cp_va_kparse(conf, this, errh, cpEnd) < 0) return -1;
+    return 0;
+}
+
+MobilityBindingListEntry* MobilityBindingList::getEntry(in_addr home_address) {
+    for(std::list<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++)
+        if ((*it)->home_address == home_address)
+            return (*it);
+
+    return NULL;
+}
+
+void MobilityBindingList::insertEntry(MobilityBindingListEntry* entry) {
+    mobilityList.push_back(entry);
+}
+
+void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
+    std::list<MobilityBindingListEntry*>::iterator it = mobilityList.begin();
+    while (it != mobilityList.end()) {
+        if (*it == entry) {
+            mobilityList.erase(it);
+            //TODO verify if unallocating here is safe
+            delete entry;
+            break;
+        }
+        it++;
+    }
+}
+
+void MobilityBindingList::printList() {
+    click_chatter("Mobility Binding List: \n");
+    for (std::list<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++) {
+        const char* home_address = (IPAddress((*it)->home_address).unparse()).c_str();
+        click_chatter("home_address %s", home_address);
+        const char* care_of_address = (IPAddress((*it)->care_of_address).unparse()).c_str();
+        click_chatter("care_of_address %s", care_of_address);
+        click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
+        click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
+
+    }
+}
+
+void MobilityBindingList::push(int input, Packet *p){
+    //DOES NOT except ethernet header present
+    //Assume accepted packet
+    WritablePacket* q = (WritablePacket*) p;
+
+    if (input == 0) {
+        click_ip* ip_header = (click_ip*) (q->data());
+        if (ip_header->ip_p == 17) { //UDP
+            click_udp* udp_header = (click_udp*) (ip_header+1);
+
+
+            if (udp_header->uh_dport == 434) { //Registration
+
+                click_chatter("JIPLA");
+
+                RegistrationRequest* req = (RegistrationRequest*) (udp_header+1);
+                //Only one binding per mobile node allowed, so all cases
+                //break down to erasing the entry for that node
+                //Possibly, an entry with only a different lifetime will be added back
+                MobilityBindingListEntry* entry = getEntry(req->home_address);
+                if (entry)
+                    deleteEntry(entry);
+                //Nothing more to be done if lifetime == 0
+                if (req->lifetime != 0) {
+                    MobilityBindingListEntry* newEntry = new MobilityBindingListEntry;
+                    newEntry->home_address = req->home_address;
+                    newEntry->care_of_address = req->care_of_address;
+                    newEntry->identification[0] = htonl(req->identification[0]);
+                    newEntry->identification[1] = htonl(req->identification[1]);
+                    newEntry->remaining_lifetime = htons(req->lifetime);
+                    insertEntry(newEntry);
+                }
+                //printList();
+                //Propagate unchanged packet
+                output(0).push(p);
+                return;
+            }
+        }
+        //Not a registration
+        MobilityBindingListEntry* entry = getEntry(ip_header->ip_dst);
+        if (entry) //to be encapsulated
+            output(1).push(p);
+        else
+            output(0).push(p);
+    }
+    else if (input == 1) {
+        click_ip* ip_outer_header = (click_ip*) q->data();
+        click_ip* ip_inner_header = (click_ip*) (ip_outer_header+1);
+        MobilityBindingListEntry* entry = getEntry(ip_inner_header->ip_dst);
+        ip_outer_header->ip_dst = entry->care_of_address;
+        output(0).push(q);
+
+    }
+}
+
+
+
+
+CLICK_ENDDECLS
+EXPORT_ELEMENT(MobilityBindingList)

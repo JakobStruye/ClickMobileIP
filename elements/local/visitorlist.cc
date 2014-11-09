@@ -7,7 +7,7 @@
 
 CLICK_DECLS
 VisitorList::VisitorList(){
-    visList = std::vector<VisitorListEntry*>();
+    visList = std::list<VisitorListEntry*>();
 
 }
 
@@ -20,10 +20,9 @@ int VisitorList::configure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 VisitorListEntry* VisitorList::getEntry(uint32_t identification) {
-    std::cout << "IN THE FISH" << identification << std::endl;
-    for(int i = 0; i < visList.size(); i++)
-        if (visList[i]->identification[1] == identification)
-            return visList[i];
+    for(std::list<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++)
+        if ((*it)->identification[1] == identification)
+            return (*it);
 
     return NULL;
 }
@@ -33,14 +32,36 @@ void VisitorList::insertEntry(VisitorListEntry* entry) {
 }
 
 void VisitorList::deleteEntry(VisitorListEntry* entry) {
-    std::vector<VisitorListEntry*>::iterator it = visList.begin();
+    std::list<VisitorListEntry*>::iterator it = visList.begin();
     while (it != visList.end()) {
         if (*it == entry) {
             visList.erase(it);
+            //TODO verify if unallocating here is safe
+            delete entry;
             break;
         }
         it++;
     }
+}
+
+void VisitorList::printList() {
+    click_chatter("Visitor List: \n");
+    for (std::list<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++) {
+
+        click_chatter("MAC %i:%i:%i:%i:%i:%i", (*it)->mobile_MAC[0], (*it)->mobile_MAC[0], (*it)->mobile_MAC[1],
+                (*it)->mobile_MAC[2], (*it)->mobile_MAC[3], (*it)->mobile_MAC[4], (*it)->mobile_MAC[5]);
+        const char* ip_src = (IPAddress((*it)->ip_src).unparse()).c_str();
+        click_chatter("src %s", ip_src);
+        const char* ip_dst = (IPAddress((*it)->ip_dst).unparse()).c_str();
+        click_chatter("dst %s", ip_dst);
+        const char* home_agent = (IPAddress((*it)->home_agent).unparse()).c_str();
+        click_chatter("home_agent %s", home_agent);
+        click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
+        click_chatter("lifetime %i", (*it)->lifetime);
+        click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
+
+    }
+
 }
 
 void VisitorList::push(int, Packet *p){
@@ -61,9 +82,12 @@ void VisitorList::push(int, Packet *p){
         entry->identification[1] = req->identification[1];
         entry->identification[0] = htonl(entry->identification[0]);
         entry->identification[1] = htonl(entry->identification[1]);
-        entry->lifetime = req->lifetime;
-        entry->remaining_lifetime = req->lifetime;
+        entry->lifetime = htons(req->lifetime);
+        entry->remaining_lifetime = htons(req->lifetime);
+        const char* test = IPAddress(entry->ip_src).unparse().c_str();
+
         insertEntry(entry);
+        //printList();
         output(0).push(q);
     }
     else {
@@ -75,7 +99,6 @@ void VisitorList::push(int, Packet *p){
         ip_header->ip_src = entry->ip_dst;
         ip_header->ip_dst = entry->ip_src;
         udp_header->uh_dport = entry->port_src;
-        click_chatter("HERE2");
         output(1).push(q);
 
     }

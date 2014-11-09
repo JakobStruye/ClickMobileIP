@@ -22,7 +22,7 @@ int RegistrationRequestSender::configure(Vector<String> &conf, ErrorHandler *err
 
 Packet* RegistrationRequestSender::makePacket() {
 	int packetsize = sizeof(RegistrationRequest);
-	int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
+	int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ip) + sizeof(click_ether); //headroom for ip-in-ip too
 	WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
 	if (packet == 0) click_chatter("cannot make packet!");
 	memset(packet->data(), 0, packet->length());

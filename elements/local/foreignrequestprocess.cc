@@ -56,8 +56,9 @@ void ForeignRequestProcess::push(int, Packet *p){
     RegistrationRequest * req = (RegistrationRequest*) (udp_header+1);
     ip_header->ip_src = ip_header->ip_dst;
     ip_header->ip_dst = req->home_agent;
-    udp_header->uh_sport = htons(1234); //random?
-    udp_header->uh_dport = htons(343);
+    udp_header->uh_sport = 1234; //random?
+    udp_header->uh_dport = 434;
+    click_chatter("Hier %i", udp_header->uh_dport);
     output(0).push(q);
 }
 
