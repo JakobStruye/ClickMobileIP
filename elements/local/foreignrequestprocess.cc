@@ -4,6 +4,7 @@
 #include "foreignrequestprocess.hh"
 #include <iostream>
 
+
 CLICK_DECLS
 ForeignRequestProcess::ForeignRequestProcess(){
 
@@ -27,9 +28,9 @@ Packet* ForeignRequestProcess::makeReply() {
     int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_icmp) + sizeof(click_ether);
     WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
     if (packet == 0) click_chatter("cannot make packet!");
-    memset(packet->data(), 0, packet->length());
+    /*memset(packet->data(), 0, packet->length());
     RegistrationRequest* format = (RegistrationRequest*) packet->data();
-    format->type = htonl(1); //fixed
+    format->type = 1; //fixed
   format->flags[0] = 0; //S
   format->flags[1] = 0; //B
   format->flags[2] = 0; //D
@@ -43,7 +44,7 @@ Packet* ForeignRequestProcess::makeReply() {
   format->home_agent = IPAddress("192.168.1.2").in_addr(); //192.168.1.2
   format->care_of_address = IPAddress("192.168.2.1").in_addr(); //192.168.2.1
   format->identification[0] = htonl(1000);
-  format->identification[1] = htonl(1100);
+  format->identification[1] = htonl(1100);*/
 
     return packet;
 }
@@ -54,11 +55,15 @@ void ForeignRequestProcess::push(int, Packet *p){
     click_ip* ip_header = (click_ip*) (q->data());
     click_udp* udp_header = (click_udp*) (ip_header+1);
     RegistrationRequest * req = (RegistrationRequest*) (udp_header+1);
+    if (req->type != 1) {
+        output(0).push(p);
+        return;
+    }
     ip_header->ip_src = ip_header->ip_dst;
     ip_header->ip_dst = req->home_agent;
-    udp_header->uh_sport = 1234; //random?
-    udp_header->uh_dport = 434;
-    click_chatter("Hier %i", udp_header->uh_dport);
+    udp_header->uh_sport = htons(1234); //random?
+    udp_header->uh_dport = htons(434);
+    click_chatter("Hier %s", IPAddress(ip_header->ip_dst).unparse().c_str());
     output(0).push(q);
 }
 

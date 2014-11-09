@@ -85,6 +85,7 @@ registrationrequestsender.o: \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h \
  ../include/click/handler.hh ../include/clicknet/udp.h \
  ../include/clicknet/icmp.h ../include/clicknet/ether.h \
+ ../include/click/timer.hh ../include/click/sync.hh \
  ../elements/local/registrationrequest.hh /usr/include/c++/4.8/iostream \
  /usr/include/c++/4.8/ostream /usr/include/c++/4.8/ios \
  /usr/include/c++/4.8/iosfwd /usr/include/c++/4.8/bits/stringfwd.h \
@@ -369,6 +370,10 @@ registrationrequestsender.o: \
 ../include/clicknet/icmp.h:
 
 ../include/clicknet/ether.h:
+
+../include/click/timer.hh:
+
+../include/click/sync.hh:
 
 ../elements/local/registrationrequest.hh:
 

@@ -18,7 +18,7 @@ class MobilityBindingList : public Element {
         ~MobilityBindingList();
 
         const char *class_name() const  { return "MobilityBindingList"; }
-        const char *port_count() const  { return "2/2"; }
+        const char *port_count() const  { return "3/4"; }
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
 

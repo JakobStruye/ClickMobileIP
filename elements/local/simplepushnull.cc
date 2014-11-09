@@ -20,7 +20,7 @@ int SimplePushNull::configure(Vector<String> &conf, ErrorHandler *errh) {
 void SimplePushNull::push(int, Packet *p){
     click_ip* ip_header = (click_ip*) p->data();
     click_udp* udp_header = (click_udp*) (ip_header+1);
-	click_chatter("Push works %i", udp_header->uh_sport);
+	click_chatter("Push works %i", ip_header->ip_v);
 	output(0).push(p);
 }
 

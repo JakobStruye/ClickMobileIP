@@ -13,7 +13,7 @@ class ForeignReplyProcess : public Element {
         ~ForeignReplyProcess();
 
         const char *class_name() const  { return "ForeignReplyProcess"; }
-        const char *port_count() const  { return "1/1"; }
+        const char *port_count() const  { return "1/2"; }
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
 

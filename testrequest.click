@@ -2,10 +2,9 @@ vis :: VisitorList();
 mob :: MobilityBindingList();
 
 
-ICMPPingSource(1.0.0.0, 1.0.0.1) -> 
 RegistrationRequestSender -> 
 //Print(MAXLENGTH 192) -> 
-UDPIPEncap(192.168.1.1, 4321, 192.168.2.1, 1234) -> 
+UDPIPEncap(192.168.1.1, 4321, 192.168.2.1, 434) -> 
 //Print(MAXLENGTH 192) -> 
 EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> 
 [0]vis[0] ->

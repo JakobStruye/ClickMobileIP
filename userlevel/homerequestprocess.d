@@ -84,14 +84,8 @@ homerequestprocess.o: ../elements/local/homerequestprocess.cc \
  ../include/click/handler.hh ../include/clicknet/udp.h \
  ../include/clicknet/icmp.h ../include/clicknet/ether.h \
  ../elements/local/registrationrequest.hh \
- ../elements/local/registrationreply.hh /usr/include/c++/4.8/iostream \
- /usr/include/c++/4.8/ostream /usr/include/c++/4.8/ios \
- /usr/include/c++/4.8/iosfwd /usr/include/c++/4.8/bits/stringfwd.h \
- /usr/include/c++/4.8/bits/memoryfwd.h \
- /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar \
- /usr/include/x86_64-linux-gnu/bits/wchar2.h \
- /usr/include/c++/4.8/bits/char_traits.h \
- /usr/include/c++/4.8/bits/stl_algobase.h \
+ ../elements/local/registrationreply.hh /usr/include/c++/4.8/queue \
+ /usr/include/c++/4.8/deque /usr/include/c++/4.8/bits/stl_algobase.h \
  /usr/include/c++/4.8/bits/functexcept.h \
  /usr/include/c++/4.8/bits/exception_defines.h \
  /usr/include/c++/4.8/bits/cpp_type_traits.h \
@@ -103,6 +97,28 @@ homerequestprocess.o: ../elements/local/homerequestprocess.cc \
  /usr/include/c++/4.8/bits/stl_iterator_base_funcs.h \
  /usr/include/c++/4.8/debug/debug.h \
  /usr/include/c++/4.8/bits/stl_iterator.h \
+ /usr/include/c++/4.8/bits/allocator.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
+ /usr/include/c++/4.8/ext/new_allocator.h \
+ /usr/include/c++/4.8/bits/memoryfwd.h \
+ /usr/include/c++/4.8/bits/stl_construct.h \
+ /usr/include/c++/4.8/ext/alloc_traits.h \
+ /usr/include/c++/4.8/bits/stl_uninitialized.h \
+ /usr/include/c++/4.8/bits/stl_deque.h \
+ /usr/include/c++/4.8/bits/range_access.h \
+ /usr/include/c++/4.8/bits/deque.tcc /usr/include/c++/4.8/vector \
+ /usr/include/c++/4.8/bits/stl_vector.h \
+ /usr/include/c++/4.8/bits/stl_bvector.h \
+ /usr/include/c++/4.8/bits/vector.tcc \
+ /usr/include/c++/4.8/bits/stl_heap.h \
+ /usr/include/c++/4.8/bits/stl_function.h \
+ /usr/include/c++/4.8/backward/binders.h \
+ /usr/include/c++/4.8/bits/stl_queue.h /usr/include/c++/4.8/iostream \
+ /usr/include/c++/4.8/ostream /usr/include/c++/4.8/ios \
+ /usr/include/c++/4.8/iosfwd /usr/include/c++/4.8/bits/stringfwd.h \
+ /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar \
+ /usr/include/x86_64-linux-gnu/bits/wchar2.h \
+ /usr/include/c++/4.8/bits/char_traits.h \
  /usr/include/c++/4.8/bits/localefwd.h \
  /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++locale.h \
  /usr/include/c++/4.8/clocale /usr/include/locale.h \
@@ -116,14 +132,8 @@ homerequestprocess.o: ../elements/local/homerequestprocess.cc \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
  /usr/include/x86_64-linux-gnu/c++/4.8/bits/atomic_word.h \
  /usr/include/c++/4.8/bits/locale_classes.h /usr/include/c++/4.8/string \
- /usr/include/c++/4.8/bits/allocator.h \
- /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
- /usr/include/c++/4.8/ext/new_allocator.h \
  /usr/include/c++/4.8/bits/ostream_insert.h \
  /usr/include/c++/4.8/bits/cxxabi_forced.h \
- /usr/include/c++/4.8/bits/stl_function.h \
- /usr/include/c++/4.8/backward/binders.h \
- /usr/include/c++/4.8/bits/range_access.h \
  /usr/include/c++/4.8/bits/basic_string.h \
  /usr/include/c++/4.8/bits/basic_string.tcc \
  /usr/include/c++/4.8/bits/locale_classes.tcc \
@@ -373,25 +383,9 @@ homerequestprocess.o: ../elements/local/homerequestprocess.cc \
 
 ../elements/local/registrationreply.hh:
 
-/usr/include/c++/4.8/iostream:
+/usr/include/c++/4.8/queue:
 
-/usr/include/c++/4.8/ostream:
-
-/usr/include/c++/4.8/ios:
-
-/usr/include/c++/4.8/iosfwd:
-
-/usr/include/c++/4.8/bits/stringfwd.h:
-
-/usr/include/c++/4.8/bits/memoryfwd.h:
-
-/usr/include/c++/4.8/bits/postypes.h:
-
-/usr/include/c++/4.8/cwchar:
-
-/usr/include/x86_64-linux-gnu/bits/wchar2.h:
-
-/usr/include/c++/4.8/bits/char_traits.h:
+/usr/include/c++/4.8/deque:
 
 /usr/include/c++/4.8/bits/stl_algobase.h:
 
@@ -418,6 +412,60 @@ homerequestprocess.o: ../elements/local/homerequestprocess.cc \
 /usr/include/c++/4.8/debug/debug.h:
 
 /usr/include/c++/4.8/bits/stl_iterator.h:
+
+/usr/include/c++/4.8/bits/allocator.h:
+
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
+
+/usr/include/c++/4.8/ext/new_allocator.h:
+
+/usr/include/c++/4.8/bits/memoryfwd.h:
+
+/usr/include/c++/4.8/bits/stl_construct.h:
+
+/usr/include/c++/4.8/ext/alloc_traits.h:
+
+/usr/include/c++/4.8/bits/stl_uninitialized.h:
+
+/usr/include/c++/4.8/bits/stl_deque.h:
+
+/usr/include/c++/4.8/bits/range_access.h:
+
+/usr/include/c++/4.8/bits/deque.tcc:
+
+/usr/include/c++/4.8/vector:
+
+/usr/include/c++/4.8/bits/stl_vector.h:
+
+/usr/include/c++/4.8/bits/stl_bvector.h:
+
+/usr/include/c++/4.8/bits/vector.tcc:
+
+/usr/include/c++/4.8/bits/stl_heap.h:
+
+/usr/include/c++/4.8/bits/stl_function.h:
+
+/usr/include/c++/4.8/backward/binders.h:
+
+/usr/include/c++/4.8/bits/stl_queue.h:
+
+/usr/include/c++/4.8/iostream:
+
+/usr/include/c++/4.8/ostream:
+
+/usr/include/c++/4.8/ios:
+
+/usr/include/c++/4.8/iosfwd:
+
+/usr/include/c++/4.8/bits/stringfwd.h:
+
+/usr/include/c++/4.8/bits/postypes.h:
+
+/usr/include/c++/4.8/cwchar:
+
+/usr/include/x86_64-linux-gnu/bits/wchar2.h:
+
+/usr/include/c++/4.8/bits/char_traits.h:
 
 /usr/include/c++/4.8/bits/localefwd.h:
 
@@ -453,21 +501,9 @@ homerequestprocess.o: ../elements/local/homerequestprocess.cc \
 
 /usr/include/c++/4.8/string:
 
-/usr/include/c++/4.8/bits/allocator.h:
-
-/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
-
-/usr/include/c++/4.8/ext/new_allocator.h:
-
 /usr/include/c++/4.8/bits/ostream_insert.h:
 
 /usr/include/c++/4.8/bits/cxxabi_forced.h:
-
-/usr/include/c++/4.8/bits/stl_function.h:
-
-/usr/include/c++/4.8/backward/binders.h:
-
-/usr/include/c++/4.8/bits/range_access.h:
 
 /usr/include/c++/4.8/bits/basic_string.h:
 

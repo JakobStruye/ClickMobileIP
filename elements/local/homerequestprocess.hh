@@ -7,6 +7,8 @@
 #include <clicknet/ether.h>
 #include "registrationrequest.hh"
 #include "registrationreply.hh"
+#include <queue>
+
 CLICK_DECLS
 
 class HomeRequestProcess : public Element {
@@ -15,12 +17,15 @@ class HomeRequestProcess : public Element {
         ~HomeRequestProcess();
 
         const char *class_name() const  { return "HomeRequestProcess"; }
-        const char *port_count() const  { return "1/1"; }
+        const char *port_count() const  { return "2/3"; }
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
 
         WritablePacket* makeReply(RegistrationRequest*);
         void push(int, Packet *);
+
+    private:
+        std::queue<Packet*> requests;
 
 };
 

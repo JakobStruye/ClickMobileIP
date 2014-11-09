@@ -6,7 +6,13 @@
 elementclass HomeAgent 
 {
 $private_address, $public_address, $default_gateway
+
 |
+
+  mob :: MobilityBindingList()
+  reqtorep :: HomeRequestProcess;
+  enc :: Encapsulator(SRC $private_address:ip);
+
 	// Shared IP input path and routing table
 	ip :: Strip(14)
 	-> CheckIPHeader
@@ -38,10 +44,30 @@ $private_address, $public_address, $default_gateway
 	c1[2] -> Paint(2) -> ip;
 	
 	// Local delivery
-	rt[0] -> [2]output; 
+	rt[0] -> [0]mob[2] 
+  -> [0]reqtorep[1]
+  -> UDPIPEncap(1.1.1.1, 1, 2.2.2.2, 2) //changed in next element
+  -> [1]reqtorep[0]
+  -> GetIPAddress(IP dst)
+  -> SetUDPChecksum
+  -> SetIPChecksum
+  -> rt;
+
+  reqtorep[2] -> [2]output;
+
+  mob[0] -> GetIPAddress(IP dst)  -> SetUDPChecksum -> SetIPChecksum ->rt;
+
+  mob[1]
+  -> IPEncap(ipip, 3.3.3.3, 4.4.4.4)
+  -> enc[0]
+  -> [1]mob;
+
+  enc[1] -> [2]output;
 	
 	// Forwarding path for eth0
-	rt[1] -> DropBroadcasts
+	rt[1] 
+  -> [2]mob[3]
+  -> DropBroadcasts
 	-> cp0 :: PaintTee(1)
 	-> gio0 :: IPGWOptions($private_address)
 	-> FixIPSrc($private_address)
@@ -64,6 +90,7 @@ $private_address, $public_address, $default_gateway
 	dt1[1] -> ICMPError($public_address, timeexceeded) -> rt;
 	fr1[1] -> ICMPError($public_address, unreachable, needfrag) -> rt;
 	gio1[1] -> ICMPError($public_address, parameterproblem) -> rt;
-	cp1[1] -> ICMPError($public_address, redirect, host) -> rt;
+	//cp1[1] -> ICMPError($public_address, redirect, host) -> rt; FIX
+  cp1[1] -> Discard
 
 }

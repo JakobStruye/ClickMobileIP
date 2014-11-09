@@ -17,11 +17,13 @@ class VisitorList : public Element {
         ~VisitorList();
 
         const char *class_name() const  { return "VisitorList"; }
-        const char *port_count() const  { return "2/2"; }
+        const char *port_count() const  { return "3/3"; }
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
 
         VisitorListEntry* getEntry(uint32_t);
+        VisitorListEntry* getEntry(in_addr);
+
         void insertEntry(VisitorListEntry*);
         void deleteEntry(VisitorListEntry*);
         void printList();
@@ -29,6 +31,7 @@ class VisitorList : public Element {
         void push(int, Packet *);
     private:
         std::list<VisitorListEntry*> visList;
+        in_addr ipAddr;
 
 
 

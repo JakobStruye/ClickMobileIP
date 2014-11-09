@@ -7,6 +7,7 @@ elementclass ForeignAgent
 {
 $private_address, $public_address, $default_gateway
 |
+  vis :: VisitorList(IP $private_address);
 	// Shared IP input path and routing table
 	ip :: Strip(14)
 	-> CheckIPHeader
@@ -26,7 +27,7 @@ $private_address, $public_address, $default_gateway
 	arpq0 :: ARPQuerier($private_address) -> [0]output;
 	c0[1] -> arpt;
 	arpt[0] -> [1]arpq0;
-	c0[2] -> Paint(1) -> ip;
+	c0[2] -> [0]vis[0] -> Paint(1) -> ip;
 	
 	// Input and output paths for eth1
 	c1 :: Classifier(12/0806 20/0001, 12/0806 20/0002, -);
@@ -35,10 +36,39 @@ $private_address, $public_address, $default_gateway
 	arpq1 :: ARPQuerier($public_address) -> [1]output;
 	c1[1] -> arpt;
 	arpt[1] -> [1]arpq1;
-	c1[2] -> Paint(2) -> ip;
+	c1[2] ->  Paint(2) -> ip;
 	
 	// Local delivery
-	rt[0] -> [2]output; 
+  //First check for tunneled packets and decapsulate
+	rt[0] -> findencap::IPClassifier(ip proto 4, -);
+
+  findencap[0]
+  -> Strip(20) //outer IP header
+  -> SimplePushNull
+  -> MarkIPHeader
+  -> SetIPChecksum
+  -> CheckIPHeader
+  -> EtherEncap(0x0800, $private_address:ether, 2:2:2:2:2:2)
+  -> [2]vis[2]  //More checks etc
+  -> ToDump("test.dump")
+  -> [0]output;
+
+  findencap[1] 
+  -> forrep::ForeignReplyProcess[0] -> ForeignRequestProcess -> GetIPAddress(IP dst) -> SetIPChecksum -> rt; 
+
+  forrep[1] 
+  -> GetIPAddress(IP dst) 
+  -> SetIPChecksum
+	-> gioReply :: IPGWOptions($public_address)
+	-> FixIPSrc($public_address)
+	-> dtReply :: DecIPTTL
+	-> frReply :: IPFragmenter(1500)
+  -> EtherEncap(0x0800, $private_address:ether, 1:1:1:1:1:1)
+  -> [1]vis[1] 
+  -> [0]output;
+  
+
+  Idle -> [2]output
 	
 	// Forwarding path for eth0
 	rt[1] -> DropBroadcasts

@@ -1,9 +1,9 @@
 #ifndef REGISTRATIONREQUEST_HH
 #define REGISTRATIONREQUEST_HH
 
-struct RegistrationRequest {
+struct  __attribute__((__packed__)) RegistrationRequest {
 	uint8_t type;
-	bool flags[8];
+	uint8_t flags;
 	uint16_t lifetime;
 	struct in_addr home_address;
 	struct in_addr home_agent;

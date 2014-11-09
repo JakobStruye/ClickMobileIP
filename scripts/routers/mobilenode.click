@@ -27,9 +27,16 @@ $addr_info, $gateway
 	c0[1] -> arpt;
 	arpt[0] -> [1]arpq0;
 	c0[2] -> Paint(1) -> ip;
+
+  //Generate registration requests
+  request :: RegistrationRequestSender();
+  request[0] ->  UDPIPEncap($addr_info:ip, 1234, 192.168.3.254, 434)
+  -> EtherEncap(0x0800, $addr_info, 00:50:BA:85:84:C1)
+  -> [0]output;
 		
 	// Local delivery
 	rt[0] ->
+  [0]request[1] ->
   //Script(TYPE PACKET, write rt.remove 0.0.0.0/0.0.0.0) ->
   //Script(TYPE PACKET, write rt.add 0.0.0.0/0.0.0.0 1.0.0.0 ) ->
   [1]output; 

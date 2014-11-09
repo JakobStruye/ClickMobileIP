@@ -67,8 +67,8 @@ void MobilityBindingList::push(int input, Packet *p){
         if (ip_header->ip_p == 17) { //UDP
             click_udp* udp_header = (click_udp*) (ip_header+1);
 
-
-            if (udp_header->uh_dport == 434) { //Registration
+            click_chatter("MOBBDIND %i",ntohs(udp_header->uh_dport));
+            if (ntohs(udp_header->uh_dport) == 434) { //Registration
 
                 click_chatter("JIPLA");
 
@@ -80,33 +80,38 @@ void MobilityBindingList::push(int input, Packet *p){
                 if (entry)
                     deleteEntry(entry);
                 //Nothing more to be done if lifetime == 0
-                if (req->lifetime != 0) {
+                if (ntohs(req->lifetime) != 0) {
                     MobilityBindingListEntry* newEntry = new MobilityBindingListEntry;
                     newEntry->home_address = req->home_address;
                     newEntry->care_of_address = req->care_of_address;
-                    newEntry->identification[0] = htonl(req->identification[0]);
-                    newEntry->identification[1] = htonl(req->identification[1]);
-                    newEntry->remaining_lifetime = htons(req->lifetime);
+                    newEntry->identification[0] = ntohl(req->identification[0]);
+                    newEntry->identification[1] = ntohl(req->identification[1]);
+                    newEntry->remaining_lifetime = ntohs(req->lifetime);
                     insertEntry(newEntry);
                 }
-                //printList();
+                printList();
                 //Propagate unchanged packet
-                output(0).push(p);
+                output(2).push(p);
                 return;
             }
         }
+    }
+    else if (input == 2) {
         //Not a registration
+        click_ip* ip_header = (click_ip*) (q->data());
         MobilityBindingListEntry* entry = getEntry(ip_header->ip_dst);
+        click_chatter("CHECKING IF TO BE ENCAPSD");
         if (entry) //to be encapsulated
             output(1).push(p);
         else
-            output(0).push(p);
+            output(3).push(p);
     }
     else if (input == 1) {
         click_ip* ip_outer_header = (click_ip*) q->data();
         click_ip* ip_inner_header = (click_ip*) (ip_outer_header+1);
         MobilityBindingListEntry* entry = getEntry(ip_inner_header->ip_dst);
         ip_outer_header->ip_dst = entry->care_of_address;
+        ip_outer_header->ip_src = ip_inner_header->ip_dst;
         output(0).push(q);
 
     }
