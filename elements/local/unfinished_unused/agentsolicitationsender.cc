@@ -54,4 +54,4 @@ void AgentSolicitationSender::run_timer(Timer *) {
 
 
 CLICK_ENDDECLS
-EXPORT_ELEMENT(AgentSolicitationSender)
+//EXPORT_ELEMENT(AgentSolicitationSender)

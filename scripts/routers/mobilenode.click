@@ -9,6 +9,7 @@ $addr_info, $gateway
 |
 
   udpipenc :: UDPIPEncap($addr_info:ip, 1234, 192.168.3.254, 434)
+
 	// Shared IP input path and routing table
 	ip :: Strip(14)
 	//-> IPPrint("test")
@@ -30,23 +31,23 @@ $addr_info, $gateway
 	arpt[0] -> [1]arpq0;
 	c0[2] -> Paint(1) -> ip;
 
-  //Generate registration requests
+  //Generate registration requests (for now on a timer)
   request :: RegistrationRequestSender();
   request[0]
+  //Set the destination address for Requests (later via Advertisements, now this way)
   -> Script (TYPE PACKET, set dstaddr $(request.gateway), write udpipenc.dst $dstaddr)  
+  //Already set the new default gateway (needed because no Advertisements, should actually be done after getting Reply)
   -> Script(TYPE PACKET, set gw $(request.gateway), write rt.remove 0.0.0.0/0.0.0.0, write rt.add 0.0.0.0/0.0.0.0 $gw 1)
-  //->  Script(TYPE PACKET, read rt.table)
   -> udpipenc
-  -> ToDump("test.dump", ENCAP IP)
-  //-> EtherEncap(0x0800, $addr_info, 00:50:BA:85:84:C1)
-  //-> [0]output;
   -> rt
 		
 	// Local delivery
 	rt[0] ->
+  //Check if Reply, and process it if so
   [0]request[1] ->
-  //Script(TYPE PACKET, read rt.table) ->
+  //Change the routing table according to new Reply (will leave it unchanged if it was not a Reply)
   Script(TYPE PACKET, set gw $(request.gateway), write rt.remove 0.0.0.0/0.0.0.0, write rt.add 0.0.0.0/0.0.0.0 $gw 1) ->
+  //To ICMPPingReponder (RegistrationReply and other non ICMPPingRequests will be discarded there)
   [1]output; 
 	
 	// Forwarding path for eth0

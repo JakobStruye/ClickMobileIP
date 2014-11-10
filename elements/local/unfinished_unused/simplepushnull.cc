@@ -25,4 +25,4 @@ void SimplePushNull::push(int, Packet *p){
 }
 
 CLICK_ENDDECLS
-EXPORT_ELEMENT(SimplePushNull)
+//EXPORT_ELEMENT(SimplePushNull)

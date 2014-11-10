@@ -37,7 +37,16 @@ WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req) {
     format->identification[1] = req->identification[1];
     return packet;
 }
-
+/**
+ * Excpets IP packets
+ *
+ * Input 0: Expects valid Registration Request, creates a Registration Reply, stores Request
+ * Input 1: Expects Reply just created and sent to Output 0, now with UDP and IP headers present
+ *
+ * Output 0: Reply from Input 1, now with correct IP addresses and UDP ports
+ * Output 1: Reply created while handling packet from Input 0
+ * Output 2: Registration from Input 0, after properly setting its Reply; is to be Discarded
+ */
 
 void HomeRequestProcess::push(int input, Packet *p){
     //verify packet

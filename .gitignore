@@ -19,3 +19,4 @@ userlevel/elements.cc
 userlevel/elements.conf
 userlevel/elements.mk
 userlevel/libclick.a
+*.dump

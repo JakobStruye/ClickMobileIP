@@ -8,6 +8,8 @@ elementclass ForeignAgent
 $private_address, $public_address, $default_gateway
 |
   vis :: VisitorList(IP $private_address);
+
+
 	// Shared IP input path and routing table
 	ip :: Strip(14)
 	-> CheckIPHeader
@@ -27,7 +29,10 @@ $private_address, $public_address, $default_gateway
 	arpq0 :: ARPQuerier($private_address) -> [0]output;
 	c0[1] -> arpt;
 	arpt[0] -> [1]arpq0;
-	c0[2] -> [0]vis[0] -> Paint(1) -> ip;
+	c0[2] 
+  //Fill in Visitor List (if registration, will be checked)
+  -> [0]vis[0] 
+  -> Paint(1) -> ip;
 	
 	// Input and output paths for eth1
 	c1 :: Classifier(12/0806 20/0001, 12/0806 20/0002, -);
@@ -42,30 +47,43 @@ $private_address, $public_address, $default_gateway
   //First check for tunneled packets and decapsulate
 	rt[0] -> findencap::IPClassifier(ip proto 4, -);
 
+  //Tunneled packets
   findencap[0]
   -> Strip(20) //outer IP header
-  -> MarkIPHeader
-  -> SetIPChecksum
   -> CheckIPHeader
+  //Placeholder dst
   -> EtherEncap(0x0800, $private_address:ether, 2:2:2:2:2:2)
-  -> [2]vis[2]  //More checks etc
+  //set ethernet dst
+  -> [2]vis[2]
   -> [0]output;
 
+  //Not a tunneled packet
   findencap[1] 
-  -> forrep::ForeignReplyProcess[0] -> ForeignRequestProcess -> GetIPAddress(IP dst) -> SetIPChecksum -> rt; 
+  //Check if Registration Reply or Request
+  -> forrep::ForeignReplyProcess[0] //on this output if not Reply
+  //Must be Request then, change IP addresses and UDP ports
+  -> ForeignRequestProcess 
+  -> GetIPAddress(IP dst) 
+  -> SetIPChecksum -> SetUDPChecksum -> rt; 
 
+  //Registration Reply
   forrep[1] 
   -> GetIPAddress(IP dst) 
-  -> SetIPChecksum
 	-> gioReply :: IPGWOptions($public_address)
 	-> FixIPSrc($public_address)
 	-> dtReply :: DecIPTTL
 	-> frReply :: IPFragmenter(1500)
+  //dst address placeholder
   -> EtherEncap(0x0800, $private_address:ether, 1:1:1:1:1:1)
+  //Set Ethernet dst, UDP src/dst, UDP ports
   -> [1]vis[1] 
+  -> Strip(14)
+  -> SetIPChecksum
+  -> SetUDPChecksum
+  -> Unstrip(14)
   -> [0]output;
   
-
+  //Fixes error of nonexistent output
   Idle -> [2]output
 	
 	// Forwarding path for eth0

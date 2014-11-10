@@ -17,7 +17,14 @@ int ReplyPrinter::configure(Vector<String> &conf, ErrorHandler *errh) {
     return 0;
 }
 
-
+/*
+ * FOR TESTING PURPOSES ONLY
+ * Expects non-encapsulated Reply
+ *
+ * Input 0: Reply, to be printed
+ *
+ * Output 0: Unchanged Reply
+ */
 void ReplyPrinter::push(int, Packet *p){
     WritablePacket* q = (WritablePacket*) p;
     RegistrationReply* reply = (RegistrationReply*) (q->data());
@@ -37,7 +44,7 @@ void ReplyPrinter::push(int, Packet *p){
 
 
 CLICK_ENDDECLS
-EXPORT_ELEMENT(ReplyPrinter)
+//EXPORT_ELEMENT(ReplyPrinter)
 
 
 

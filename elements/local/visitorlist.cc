@@ -72,13 +72,24 @@ void VisitorList::printList() {
 
 }
 
+/*
+ * Expects ethernet packets
+ *
+ * Input 0: Check for Registration requests, add entry in Visitor List
+ * Input 1: Expects Registration Reply, updates Visitor List and sets Reply eth dst, IP src/dst, UDP ports
+ * Input 2: Expects packet for registered mobile node (after detunneling), sets eth dhost
+ *
+ * Output 0: Packets from Input 0, unchanged
+ * Output 1: Packets from Input 1, with aforementioned changes
+ * Output 2: Packets from Input 2 with ether_dhost set
+ */
 void VisitorList::push(int input, Packet *p){
-    //click_chatter("VISLISTSTART");
     WritablePacket* q = (WritablePacket*) p;
     click_ether* eth_header = (click_ether*) (q->data());
     click_ip* ip_header = (click_ip*) (eth_header+1);
     if (input == 2) {
         VisitorListEntry* entry = getEntry(ip_header->ip_dst);
+        //Error if !entry
         /*if (!entry)
             click_chatter("FOREIGN DOES NOT KNOW MOBILE NODE");*/
         for(int i = 0; i < 6; i++)
@@ -120,10 +131,12 @@ void VisitorList::push(int input, Packet *p){
         RegistrationReply* reply = (RegistrationReply*) (udp_header+1);
         VisitorListEntry* entry = getEntry(ntohl(reply->identification[1]));
         entry->lifetime = std::min(entry->lifetime, ntohs(reply->lifetime));
+        //Set remaining lifetime
         for(int i = 0; i < 6; i++)
             eth_header->ether_dhost[i] = entry->mobile_MAC[i];
         ip_header->ip_src = entry->ip_dst;
         ip_header->ip_dst = entry->ip_src;
+        udp_header->uh_sport = htons(434);
         udp_header->uh_dport = htons(entry->port_src);
         //click_chatter("PORTS %i %i", ntohs(udp_header->uh_sport), ntohs(udp_header->uh_dport));
         output(1).push(q);

@@ -122,7 +122,14 @@ void RegistrationRequestSender::run_timer(Timer *) {
   _timer.reschedule_after_msec(5000);
 }
 	
-
+/*
+ * Expects Registration Replies to its Requests in IP
+ *
+ * Input 0: Registration Reply to a previously sent Request (allows for other packets, won't change them or crash)
+ *
+ * Output 0: (in run_timer) new Registration Request
+ * Output 1: Unchanged packets from Input 0
+ */
 void RegistrationRequestSender::push(int, Packet *p){
     click_ip* ip_header = (click_ip*) p->data();
     if (ip_header->ip_p != 17) {

@@ -57,9 +57,20 @@ void MobilityBindingList::printList() {
     }
 }
 
+/*
+ * Expects IP packets
+ *
+ * Input 0: Expects Registration Request (valid), creates Mobility Binding
+ * Input 1: Expects packet to be tunneled with outer header present
+ * Input 2: Expects any packet but Registration, checks if should be tunneled
+ *
+ * Output 0: Packet from Input 1 with IP addresses set
+ * Output 1: Unchanged packets from Input 2, to be tunneled
+ * Output 2: Unchanged packets from Input 0
+ * Output 3: Unchanged packets frfom Input 2, not to be tunneled
+ */
+
 void MobilityBindingList::push(int input, Packet *p){
-    //DOES NOT except ethernet header present
-    //Assume accepted packet
     WritablePacket* q = (WritablePacket*) p;
 
     if (input == 0) {

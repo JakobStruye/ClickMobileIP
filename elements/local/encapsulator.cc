@@ -17,10 +17,17 @@ int Encapsulator::configure(Vector<String> &conf, ErrorHandler *errh) {
     return 0;
 }
 
-
+/*
+ * Expects packets to be tunneled with outer IP header present
+ *
+ * Input 0: Packet to be tunneled
+ *
+ * Output 0: Packet from Input 0, now checked against routing loops and with outer tos set
+ * Output 1: Packet from Input 1 that would cause loops, to be Discarded
+ *
+ */
 void Encapsulator::push(int, Packet *p){
     //Check if TTL not 0 before getting here
-    //Set outer dst ip before getting here
     //click_chatter("ENCAPPING");
     WritablePacket* q = (WritablePacket*) p;
     click_ip* ip_outer_header = (click_ip*) (q->data());

@@ -44,28 +44,36 @@ $private_address, $public_address, $default_gateway
 	c1[2] -> Paint(2) -> ip;
 	
 	// Local delivery
+  //Add MobilityBinding (assume correct request)
 	rt[0] -> [0]mob[2] 
+  //Create reply
   -> [0]reqtorep[1]
-  -> UDPIPEncap(1.1.1.1, 1, 2.2.2.2, 2) //changed in next element
+  -> UDPIPEncap(1.1.1.1, 1, 2.2.2.2, 2) //All values placeholder
+  //Set IP addresses and UDP ports
   -> [1]reqtorep[0]
   -> GetIPAddress(IP dst)
   -> SetUDPChecksum
   -> SetIPChecksum
   -> rt;
-
+  
+  //Send Request on output 2, to be discarded
   reqtorep[2] -> [2]output;
 
-  mob[0] -> GetIPAddress(IP dst)  -> SetUDPChecksum -> SetIPChecksum ->rt;
-
+  //Packet to be tunneled
   mob[1]
-  -> IPEncap(ipip, 3.3.3.3, 4.4.4.4)
+  -> IPEncap(ipip, 3.3.3.3, 4.4.4.4) //All values placeholder
+  //Check against routing loops and set tos, continue here if no loop danger
   -> enc[0]
-  -> [1]mob;
+  //Set outer IP addresses
+  -> [1]mob[0] 
+  -> GetIPAddress(IP dst) -> SetIPChecksum -> rt;
 
+  //Tunneling this would cause loops, send to output 2 to be discarded
   enc[1] -> [2]output;
 	
 	// Forwarding path for eth0
 	rt[1] 
+  //Send through MobilityBindingList, will continue here if not to be tunneled
   -> [2]mob[3]
   -> DropBroadcasts
 	-> cp0 :: PaintTee(1)

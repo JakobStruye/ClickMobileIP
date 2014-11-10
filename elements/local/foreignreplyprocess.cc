@@ -18,6 +18,14 @@ int ForeignReplyProcess::configure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 
+/*
+ * Expects IP packets
+ *
+ * Input 0: Only input, will check if Registration Reply
+ *
+ * Output 0: Unchanged, not a Registration Reply
+ * Output 1: Unchanged, Registration Reply
+ */
 void ForeignReplyProcess::push(int, Packet *p){
     WritablePacket* q = (WritablePacket*) p;
     click_ip* ip_header = (click_ip*) (q->data());
@@ -37,10 +45,9 @@ void ForeignReplyProcess::push(int, Packet *p){
         output(0).push(p);
         return;
     }
-    ip_header->ip_src = ip_header->ip_dst;
-    ip_header->ip_dst = reply->home_address;
+    //ip_header->ip_src = ip_header->ip_dst;
+    //ip_header->ip_dst = reply->home_address;
     //click_chatter("FORREP %s %i %s %i", IPAddress(ip_header->ip_src).unparse().c_str(), ntohs(udp_header->uh_sport),IPAddress(ip_header->ip_dst).unparse().c_str(), ntohs(udp_header->uh_dport));
-    udp_header->uh_sport = htons(434);
     output(1).push(q);
 }
 

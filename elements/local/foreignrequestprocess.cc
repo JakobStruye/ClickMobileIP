@@ -49,8 +49,15 @@ Packet* ForeignRequestProcess::makeReply() {
     return packet;
 }
 
-
+/**
+ * Expects Registration Requests in IP
+ *
+ * Input 0: Registration Request
+ *
+ * Output 0: Request from Input 0, now with IP addresses and UDP ports changed to reach home agent
+ */
 void ForeignRequestProcess::push(int, Packet *p){
+    //TODO verify if Registration Request
     WritablePacket* q = (WritablePacket*) p;
     click_ip* ip_header = (click_ip*) (q->data());
     click_udp* udp_header = (click_udp*) (ip_header+1);
