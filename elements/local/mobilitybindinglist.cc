@@ -67,10 +67,10 @@ void MobilityBindingList::push(int input, Packet *p){
         if (ip_header->ip_p == 17) { //UDP
             click_udp* udp_header = (click_udp*) (ip_header+1);
 
-            click_chatter("MOBBDIND %i",ntohs(udp_header->uh_dport));
+            //click_chatter("MOBBDIND %i",ntohs(udp_header->uh_dport));
             if (ntohs(udp_header->uh_dport) == 434) { //Registration
 
-                click_chatter("JIPLA");
+                //click_chatter("Mob got req");
 
                 RegistrationRequest* req = (RegistrationRequest*) (udp_header+1);
                 //Only one binding per mobile node allowed, so all cases
@@ -89,7 +89,7 @@ void MobilityBindingList::push(int input, Packet *p){
                     newEntry->remaining_lifetime = ntohs(req->lifetime);
                     insertEntry(newEntry);
                 }
-                printList();
+                //printList();
                 //Propagate unchanged packet
                 output(2).push(p);
                 return;
@@ -100,7 +100,7 @@ void MobilityBindingList::push(int input, Packet *p){
         //Not a registration
         click_ip* ip_header = (click_ip*) (q->data());
         MobilityBindingListEntry* entry = getEntry(ip_header->ip_dst);
-        click_chatter("CHECKING IF TO BE ENCAPSD");
+        //click_chatter("CHECKING IF TO BE ENCAPSD");
         if (entry) //to be encapsulated
             output(1).push(p);
         else

@@ -36,7 +36,7 @@ class Packet { public:
     // PACKET CREATION
 
     enum {
-	default_headroom = 28,		///< Default packet headroom() for
+	default_headroom = 48,		///< Default packet headroom() for
 					///  Packet::make().  4-byte aligned.
 	min_buffer_length = 64		///< Minimum buffer_length() for
 					///  Packet::make()

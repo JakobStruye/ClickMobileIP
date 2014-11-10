@@ -86,14 +86,7 @@ registrationrequestsender.o: \
  ../include/click/handler.hh ../include/clicknet/udp.h \
  ../include/clicknet/icmp.h ../include/clicknet/ether.h \
  ../include/click/timer.hh ../include/click/sync.hh \
- ../elements/local/registrationrequest.hh /usr/include/c++/4.8/iostream \
- /usr/include/c++/4.8/ostream /usr/include/c++/4.8/ios \
- /usr/include/c++/4.8/iosfwd /usr/include/c++/4.8/bits/stringfwd.h \
- /usr/include/c++/4.8/bits/memoryfwd.h \
- /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar \
- /usr/include/x86_64-linux-gnu/bits/wchar2.h \
- /usr/include/c++/4.8/bits/char_traits.h \
- /usr/include/c++/4.8/bits/stl_algobase.h \
+ /usr/include/c++/4.8/list /usr/include/c++/4.8/bits/stl_algobase.h \
  /usr/include/c++/4.8/bits/functexcept.h \
  /usr/include/c++/4.8/bits/exception_defines.h \
  /usr/include/c++/4.8/bits/cpp_type_traits.h \
@@ -105,6 +98,20 @@ registrationrequestsender.o: \
  /usr/include/c++/4.8/bits/stl_iterator_base_funcs.h \
  /usr/include/c++/4.8/debug/debug.h \
  /usr/include/c++/4.8/bits/stl_iterator.h \
+ /usr/include/c++/4.8/bits/allocator.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
+ /usr/include/c++/4.8/ext/new_allocator.h \
+ /usr/include/c++/4.8/bits/memoryfwd.h \
+ /usr/include/c++/4.8/bits/range_access.h \
+ /usr/include/c++/4.8/bits/stl_list.h /usr/include/c++/4.8/bits/list.tcc \
+ ../elements/local/registrationrequest.hh \
+ ../elements/local/registrationreply.hh \
+ ../elements/local/pendingregistration.hh /usr/include/c++/4.8/iostream \
+ /usr/include/c++/4.8/ostream /usr/include/c++/4.8/ios \
+ /usr/include/c++/4.8/iosfwd /usr/include/c++/4.8/bits/stringfwd.h \
+ /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar \
+ /usr/include/x86_64-linux-gnu/bits/wchar2.h \
+ /usr/include/c++/4.8/bits/char_traits.h \
  /usr/include/c++/4.8/bits/localefwd.h \
  /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++locale.h \
  /usr/include/c++/4.8/clocale /usr/include/locale.h \
@@ -118,14 +125,10 @@ registrationrequestsender.o: \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
  /usr/include/x86_64-linux-gnu/c++/4.8/bits/atomic_word.h \
  /usr/include/c++/4.8/bits/locale_classes.h /usr/include/c++/4.8/string \
- /usr/include/c++/4.8/bits/allocator.h \
- /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
- /usr/include/c++/4.8/ext/new_allocator.h \
  /usr/include/c++/4.8/bits/ostream_insert.h \
  /usr/include/c++/4.8/bits/cxxabi_forced.h \
  /usr/include/c++/4.8/bits/stl_function.h \
  /usr/include/c++/4.8/backward/binders.h \
- /usr/include/c++/4.8/bits/range_access.h \
  /usr/include/c++/4.8/bits/basic_string.h \
  /usr/include/c++/4.8/bits/basic_string.tcc \
  /usr/include/c++/4.8/bits/locale_classes.tcc \
@@ -375,27 +378,7 @@ registrationrequestsender.o: \
 
 ../include/click/sync.hh:
 
-../elements/local/registrationrequest.hh:
-
-/usr/include/c++/4.8/iostream:
-
-/usr/include/c++/4.8/ostream:
-
-/usr/include/c++/4.8/ios:
-
-/usr/include/c++/4.8/iosfwd:
-
-/usr/include/c++/4.8/bits/stringfwd.h:
-
-/usr/include/c++/4.8/bits/memoryfwd.h:
-
-/usr/include/c++/4.8/bits/postypes.h:
-
-/usr/include/c++/4.8/cwchar:
-
-/usr/include/x86_64-linux-gnu/bits/wchar2.h:
-
-/usr/include/c++/4.8/bits/char_traits.h:
+/usr/include/c++/4.8/list:
 
 /usr/include/c++/4.8/bits/stl_algobase.h:
 
@@ -422,6 +405,44 @@ registrationrequestsender.o: \
 /usr/include/c++/4.8/debug/debug.h:
 
 /usr/include/c++/4.8/bits/stl_iterator.h:
+
+/usr/include/c++/4.8/bits/allocator.h:
+
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
+
+/usr/include/c++/4.8/ext/new_allocator.h:
+
+/usr/include/c++/4.8/bits/memoryfwd.h:
+
+/usr/include/c++/4.8/bits/range_access.h:
+
+/usr/include/c++/4.8/bits/stl_list.h:
+
+/usr/include/c++/4.8/bits/list.tcc:
+
+../elements/local/registrationrequest.hh:
+
+../elements/local/registrationreply.hh:
+
+../elements/local/pendingregistration.hh:
+
+/usr/include/c++/4.8/iostream:
+
+/usr/include/c++/4.8/ostream:
+
+/usr/include/c++/4.8/ios:
+
+/usr/include/c++/4.8/iosfwd:
+
+/usr/include/c++/4.8/bits/stringfwd.h:
+
+/usr/include/c++/4.8/bits/postypes.h:
+
+/usr/include/c++/4.8/cwchar:
+
+/usr/include/x86_64-linux-gnu/bits/wchar2.h:
+
+/usr/include/c++/4.8/bits/char_traits.h:
 
 /usr/include/c++/4.8/bits/localefwd.h:
 
@@ -457,12 +478,6 @@ registrationrequestsender.o: \
 
 /usr/include/c++/4.8/string:
 
-/usr/include/c++/4.8/bits/allocator.h:
-
-/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
-
-/usr/include/c++/4.8/ext/new_allocator.h:
-
 /usr/include/c++/4.8/bits/ostream_insert.h:
 
 /usr/include/c++/4.8/bits/cxxabi_forced.h:
@@ -470,8 +485,6 @@ registrationrequestsender.o: \
 /usr/include/c++/4.8/bits/stl_function.h:
 
 /usr/include/c++/4.8/backward/binders.h:
-
-/usr/include/c++/4.8/bits/range_access.h:
 
 /usr/include/c++/4.8/bits/basic_string.h:
 

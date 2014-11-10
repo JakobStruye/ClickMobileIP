@@ -7,6 +7,8 @@ elementclass MobileNode
 {
 $addr_info, $gateway
 |
+
+  udpipenc :: UDPIPEncap($addr_info:ip, 1234, 192.168.3.254, 434)
 	// Shared IP input path and routing table
 	ip :: Strip(14)
 	//-> IPPrint("test")
@@ -30,15 +32,21 @@ $addr_info, $gateway
 
   //Generate registration requests
   request :: RegistrationRequestSender();
-  request[0] ->  UDPIPEncap($addr_info:ip, 1234, 192.168.3.254, 434)
-  -> EtherEncap(0x0800, $addr_info, 00:50:BA:85:84:C1)
-  -> [0]output;
+  request[0]
+  -> Script (TYPE PACKET, set dstaddr $(request.gateway), write udpipenc.dst $dstaddr)  
+  -> Script(TYPE PACKET, set gw $(request.gateway), write rt.remove 0.0.0.0/0.0.0.0, write rt.add 0.0.0.0/0.0.0.0 $gw 1)
+  //->  Script(TYPE PACKET, read rt.table)
+  -> udpipenc
+  -> ToDump("test.dump", ENCAP IP)
+  //-> EtherEncap(0x0800, $addr_info, 00:50:BA:85:84:C1)
+  //-> [0]output;
+  -> rt
 		
 	// Local delivery
 	rt[0] ->
   [0]request[1] ->
-  //Script(TYPE PACKET, write rt.remove 0.0.0.0/0.0.0.0) ->
-  //Script(TYPE PACKET, write rt.add 0.0.0.0/0.0.0.0 1.0.0.0 ) ->
+  //Script(TYPE PACKET, read rt.table) ->
+  Script(TYPE PACKET, set gw $(request.gateway), write rt.remove 0.0.0.0/0.0.0.0, write rt.add 0.0.0.0/0.0.0.0 $gw 1) ->
   [1]output; 
 	
 	// Forwarding path for eth0

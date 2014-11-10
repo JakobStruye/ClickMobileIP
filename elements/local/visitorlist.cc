@@ -73,17 +73,17 @@ void VisitorList::printList() {
 }
 
 void VisitorList::push(int input, Packet *p){
-    click_chatter("VISLISTSTART");
+    //click_chatter("VISLISTSTART");
     WritablePacket* q = (WritablePacket*) p;
     click_ether* eth_header = (click_ether*) (q->data());
     click_ip* ip_header = (click_ip*) (eth_header+1);
     if (input == 2) {
         VisitorListEntry* entry = getEntry(ip_header->ip_dst);
-        if (!entry)
-            click_chatter("FOREIGN DOES NOT KNOW MOBILE NODE");
+        /*if (!entry)
+            click_chatter("FOREIGN DOES NOT KNOW MOBILE NODE");*/
         for(int i = 0; i < 6; i++)
             eth_header->ether_dhost[i] = entry->mobile_MAC[i];
-        click_chatter("DECAPSD ETH SET");
+        //click_chatter("DECAPSD ETH SET");
         output(2).push(q);
         return;
     }
@@ -91,10 +91,11 @@ void VisitorList::push(int input, Packet *p){
         output(0).push(p); //not a registration request, pass along
         return;
     }
-
     click_udp* udp_header = (click_udp*) (ip_header+1);
-    if (ntohs(udp_header->uh_dport) != 434) {
-        output(0).push(p); //not a registration request, pass along
+
+
+    if (ntohs(udp_header->uh_dport) != 434 && ntohs(udp_header->uh_sport) != 434) {
+        output(0).push(p); //not a registration message, pass along
         return;
     }
     RegistrationRequest* req = (RegistrationRequest*) (udp_header+1);
@@ -112,7 +113,7 @@ void VisitorList::push(int input, Packet *p){
         entry->remaining_lifetime = ntohs(req->lifetime);
 
         insertEntry(entry);
-        printList();
+        //printList();
         output(0).push(q);
     }
     else if (input == 1){
@@ -124,7 +125,7 @@ void VisitorList::push(int input, Packet *p){
         ip_header->ip_src = entry->ip_dst;
         ip_header->ip_dst = entry->ip_src;
         udp_header->uh_dport = htons(entry->port_src);
-        click_chatter("PORTS %i %i", ntohs(udp_header->uh_sport), ntohs(udp_header->uh_dport));
+        //click_chatter("PORTS %i %i", ntohs(udp_header->uh_sport), ntohs(udp_header->uh_dport));
         output(1).push(q);
 
     }

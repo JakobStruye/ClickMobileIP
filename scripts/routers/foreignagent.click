@@ -44,13 +44,11 @@ $private_address, $public_address, $default_gateway
 
   findencap[0]
   -> Strip(20) //outer IP header
-  -> SimplePushNull
   -> MarkIPHeader
   -> SetIPChecksum
   -> CheckIPHeader
   -> EtherEncap(0x0800, $private_address:ether, 2:2:2:2:2:2)
   -> [2]vis[2]  //More checks etc
-  -> ToDump("test.dump")
   -> [0]output;
 
   findencap[1] 

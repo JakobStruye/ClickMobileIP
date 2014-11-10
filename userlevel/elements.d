@@ -96,18 +96,7 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
  ../elements/icmp/icmppingresponder.hh ../elements/test/biginttest.hh \
  ../elements/local/registrationrequestsender.hh ../include/clicknet/udp.h \
  ../include/clicknet/icmp.h ../include/clicknet/ether.h \
- ../elements/local/registrationrequest.hh ../elements/ip/ipmirror.hh \
- ../elements/ethernet/stripethervlanheader.hh \
- ../elements/analysis/toipsumdump.hh ../include/click/straccum.hh \
- ../elements/analysis/ipsumdumpinfo.hh ../elements/ip/decipttl.hh \
- ../elements/ethernet/vlanencap.hh ../elements/test/randomseed.hh \
- ../elements/standard/hub.hh ../elements/test/cryptotest.hh \
- ../elements/analysis/fromipsumdump.hh ../include/click/ipflowid.hh \
- ../include/click/hashcode.hh ../include/click/fromfile.hh \
- ../elements/standard/striptonet.hh ../elements/standard/storedata.hh \
- ../elements/test/vectortest.hh ../elements/local/homerequestprocess.hh \
- ../elements/local/registrationreply.hh /usr/include/c++/4.8/queue \
- /usr/include/c++/4.8/deque /usr/include/c++/4.8/bits/stl_algobase.h \
+ /usr/include/c++/4.8/list /usr/include/c++/4.8/bits/stl_algobase.h \
  /usr/include/c++/4.8/bits/functexcept.h \
  /usr/include/c++/4.8/bits/exception_defines.h \
  /usr/include/c++/4.8/bits/cpp_type_traits.h \
@@ -123,11 +112,25 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
  /usr/include/c++/4.8/ext/new_allocator.h \
  /usr/include/c++/4.8/bits/memoryfwd.h \
+ /usr/include/c++/4.8/bits/range_access.h \
+ /usr/include/c++/4.8/bits/stl_list.h /usr/include/c++/4.8/bits/list.tcc \
+ ../elements/local/registrationrequest.hh \
+ ../elements/local/registrationreply.hh \
+ ../elements/local/pendingregistration.hh ../elements/ip/ipmirror.hh \
+ ../elements/ethernet/stripethervlanheader.hh \
+ ../elements/analysis/toipsumdump.hh ../include/click/straccum.hh \
+ ../elements/analysis/ipsumdumpinfo.hh ../elements/ip/decipttl.hh \
+ ../elements/ethernet/vlanencap.hh ../elements/test/randomseed.hh \
+ ../elements/standard/hub.hh ../elements/test/cryptotest.hh \
+ ../elements/analysis/fromipsumdump.hh ../include/click/ipflowid.hh \
+ ../include/click/hashcode.hh ../include/click/fromfile.hh \
+ ../elements/standard/striptonet.hh ../elements/standard/storedata.hh \
+ ../elements/test/vectortest.hh ../elements/local/homerequestprocess.hh \
+ /usr/include/c++/4.8/queue /usr/include/c++/4.8/deque \
  /usr/include/c++/4.8/bits/stl_construct.h \
  /usr/include/c++/4.8/ext/alloc_traits.h \
  /usr/include/c++/4.8/bits/stl_uninitialized.h \
  /usr/include/c++/4.8/bits/stl_deque.h \
- /usr/include/c++/4.8/bits/range_access.h \
  /usr/include/c++/4.8/bits/deque.tcc /usr/include/c++/4.8/vector \
  /usr/include/c++/4.8/bits/stl_vector.h \
  /usr/include/c++/4.8/bits/stl_bvector.h \
@@ -206,8 +209,6 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
  ../elements/standard/tee.hh ../elements/standard/frontdropqueue.hh \
  ../elements/ip/markipce.hh ../elements/analysis/ipsumdump_ip.hh \
  ../elements/ip/radixiplookup.hh ../elements/local/mobilitybindinglist.hh \
- /usr/include/c++/4.8/list /usr/include/c++/4.8/bits/stl_list.h \
- /usr/include/c++/4.8/bits/list.tcc \
  ../elements/local/mobilitybindinglistentry.hh \
  ../elements/standard/timedsource.hh ../elements/ip/ipprint.hh \
  ../elements/icmp/icmperror.hh ../elements/tcpudp/setudpchecksum.hh \
@@ -616,7 +617,53 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
 
 ../include/clicknet/ether.h:
 
+/usr/include/c++/4.8/list:
+
+/usr/include/c++/4.8/bits/stl_algobase.h:
+
+/usr/include/c++/4.8/bits/functexcept.h:
+
+/usr/include/c++/4.8/bits/exception_defines.h:
+
+/usr/include/c++/4.8/bits/cpp_type_traits.h:
+
+/usr/include/c++/4.8/ext/type_traits.h:
+
+/usr/include/c++/4.8/ext/numeric_traits.h:
+
+/usr/include/c++/4.8/bits/stl_pair.h:
+
+/usr/include/c++/4.8/bits/move.h:
+
+/usr/include/c++/4.8/bits/concept_check.h:
+
+/usr/include/c++/4.8/bits/stl_iterator_base_types.h:
+
+/usr/include/c++/4.8/bits/stl_iterator_base_funcs.h:
+
+/usr/include/c++/4.8/debug/debug.h:
+
+/usr/include/c++/4.8/bits/stl_iterator.h:
+
+/usr/include/c++/4.8/bits/allocator.h:
+
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
+
+/usr/include/c++/4.8/ext/new_allocator.h:
+
+/usr/include/c++/4.8/bits/memoryfwd.h:
+
+/usr/include/c++/4.8/bits/range_access.h:
+
+/usr/include/c++/4.8/bits/stl_list.h:
+
+/usr/include/c++/4.8/bits/list.tcc:
+
 ../elements/local/registrationrequest.hh:
+
+../elements/local/registrationreply.hh:
+
+../elements/local/pendingregistration.hh:
 
 ../elements/ip/ipmirror.hh:
 
@@ -654,45 +701,9 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
 
 ../elements/local/homerequestprocess.hh:
 
-../elements/local/registrationreply.hh:
-
 /usr/include/c++/4.8/queue:
 
 /usr/include/c++/4.8/deque:
-
-/usr/include/c++/4.8/bits/stl_algobase.h:
-
-/usr/include/c++/4.8/bits/functexcept.h:
-
-/usr/include/c++/4.8/bits/exception_defines.h:
-
-/usr/include/c++/4.8/bits/cpp_type_traits.h:
-
-/usr/include/c++/4.8/ext/type_traits.h:
-
-/usr/include/c++/4.8/ext/numeric_traits.h:
-
-/usr/include/c++/4.8/bits/stl_pair.h:
-
-/usr/include/c++/4.8/bits/move.h:
-
-/usr/include/c++/4.8/bits/concept_check.h:
-
-/usr/include/c++/4.8/bits/stl_iterator_base_types.h:
-
-/usr/include/c++/4.8/bits/stl_iterator_base_funcs.h:
-
-/usr/include/c++/4.8/debug/debug.h:
-
-/usr/include/c++/4.8/bits/stl_iterator.h:
-
-/usr/include/c++/4.8/bits/allocator.h:
-
-/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
-
-/usr/include/c++/4.8/ext/new_allocator.h:
-
-/usr/include/c++/4.8/bits/memoryfwd.h:
 
 /usr/include/c++/4.8/bits/stl_construct.h:
 
@@ -701,8 +712,6 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
 /usr/include/c++/4.8/bits/stl_uninitialized.h:
 
 /usr/include/c++/4.8/bits/stl_deque.h:
-
-/usr/include/c++/4.8/bits/range_access.h:
 
 /usr/include/c++/4.8/bits/deque.tcc:
 
@@ -955,12 +964,6 @@ elements.o: elements.cc /usr/include/stdc-predef.h \
 ../elements/ip/radixiplookup.hh:
 
 ../elements/local/mobilitybindinglist.hh:
-
-/usr/include/c++/4.8/list:
-
-/usr/include/c++/4.8/bits/stl_list.h:
-
-/usr/include/c++/4.8/bits/list.tcc:
 
 ../elements/local/mobilitybindinglistentry.hh:
 
