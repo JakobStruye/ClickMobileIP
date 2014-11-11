@@ -57,7 +57,7 @@
 #define HAVE___SYNC_SYNCHRONIZE 1
 
 /* Define if the __sync_synchronize function supports arguments. */
-#define HAVE___SYNC_SYNCHRONIZE_ARGUMENTS 1
+/* #undef HAVE___SYNC_SYNCHRONIZE_ARGUMENTS */
 
 /* Define if the va_list type is addressable. */
 /* #undef HAVE_ADDRESSABLE_VA_LIST */
@@ -72,7 +72,7 @@
 /* #undef HAVE_CXX_CONSTEXPR */
 
 /* Define if the C++ compiler understands #pragma interface. */
-/* #undef HAVE_CXX_PRAGMA_INTERFACE */
+#define HAVE_CXX_PRAGMA_INTERFACE 1
 
 /* Define if the C++ compiler understands static_assert. */
 /* #undef HAVE_CXX_STATIC_ASSERT */

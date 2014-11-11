@@ -1,7 +1,7 @@
 # Warning: this file must be usable by regular make
 # (unlike the Makefiles in subdirectories).
 
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 
 PACKAGE = click
@@ -13,7 +13,7 @@ top_builddir = .
 subdir = .
 conf_auxdir = $(top_srcdir)
 
-AUTOCONF = $(conf_auxdir)/missing autoconf
+AUTOCONF = autoconf
 # ACLOCAL = aclocal -I m4
 ACLOCAL = :
 PERL = perl
@@ -166,7 +166,7 @@ etc/pkg-config.mk: $(srcdir)/etc/pkg-config.mk.in config.status
 $(srcdir)/configure: $(srcdir)/configure.in $(srcdir)/m4/click.m4
 	cd $(srcdir) && $(ACLOCAL) && $(AUTOCONF)
 config.status: $(srcdir)/configure
-	$(SHELL) $(srcdir)/configure  '--disable-linuxmodule' '--enable-local' '--enable-etherswitch'
+	$(SHELL) $(srcdir)/configure  '--disable-linuxmodule' '--enable-local' '--enable-etherswitch' 'CC=/usr/bin/gcc' 'CXX=/usr/bin/g++'
 Makefile: config.status $(srcdir)/Makefile.in
 	cd $(top_builddir) && \
 	  CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status

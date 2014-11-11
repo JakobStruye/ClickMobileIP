@@ -1,5 +1,5 @@
 ## Click bsdmodule driver Makefile ##
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 srcdir := .
 top_srcdir := ..
@@ -16,10 +16,10 @@ freebsd_srcdir = NONE
 
 VPATH = .:$(top_srcdir)/lib:$(top_srcdir)/$(subdir)
 
-CC = gcc
-CPP = gcc -E
-CXX = c++ -w  -W -Wall -fno-exceptions -fno-rtti -fpermissive
-CXXCPP = c++ -E
+CC = /usr/bin/gcc
+CPP = /usr/bin/gcc -E
+CXX = /usr/bin/g++ -w  -W -Wall -fno-exceptions -fno-rtti -fpermissive
+CXXCPP = /usr/bin/g++ -E
 DEPCFLAGS = -MD -MP
 LD = ld
 STRIP = strip

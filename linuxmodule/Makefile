@@ -1,6 +1,6 @@
 ## The following line supports click-mkmindriver and should not be changed.
 ## Click linuxmodule driver Makefile ##
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 subdir := linuxmodule
 conf_auxdir = $(top_srcdir)
@@ -88,8 +88,8 @@ CLICK_BUILDTOOL = $(top_builddir)/click-buildtool
 
 CLICK_ELEM2MAKE = $(CLICK_BUILDTOOL) elem2make --linux26
 
-CLICKCC = gcc -w  -W -Wall
-CLICKCXX = c++ -w  -W -Wall -fno-exceptions -fno-rtti -fpermissive
+CLICKCC = /usr/bin/gcc -w  -W -Wall
+CLICKCXX = /usr/bin/g++ -w  -W -Wall -fno-exceptions -fno-rtti -fpermissive
 
 LINUXCFLAGS = $(shell echo "$(CPPFLAGS) $(CFLAGS) $(LINUXINCLUDE)" \
 	"$(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(CFLAGS_MODULE)" | sed \
@@ -230,10 +230,10 @@ top_builddir := ..
 
 VPATH = .:$(top_srcdir)/lib:$(top_srcdir)/$(subdir):$(top_srcdir)/elements/standard
 
-CC = gcc -w  -W -Wall
-CPP = gcc -E
-CXX = c++ -w  -W -Wall -fno-exceptions -fno-rtti -fpermissive
-CXXCPP = c++ -E
+CC = /usr/bin/gcc -w  -W -Wall
+CPP = /usr/bin/gcc -E
+CXX = /usr/bin/g++ -w  -W -Wall -fno-exceptions -fno-rtti -fpermissive
+CXXCPP = /usr/bin/g++ -E
 LD = ld
 STRIP = strip
 INSTALL = /usr/bin/install -c

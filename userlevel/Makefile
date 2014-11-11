@@ -1,6 +1,6 @@
 ## The following line supports click-mkmindriver and should not be changed.
 ## Click userlevel driver Makefile ##
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 top_srcdir := ..
 srcdir := .
@@ -15,10 +15,10 @@ libdir = /usr/local/lib
 
 VPATH = .:$(top_srcdir)/lib:$(top_srcdir)/$(subdir):$(top_srcdir)/elements/standard
 
-CC = gcc
-CPP = gcc -E
-CXX = c++
-CXXCPP = c++ -E
+CC = /usr/bin/gcc
+CPP = /usr/bin/gcc -E
+CXX = /usr/bin/g++
+CXXCPP = /usr/bin/g++ -E
 DEPCFLAGS = -MD -MP
 AR_CREATE = ar cru
 RANLIB = ranlib

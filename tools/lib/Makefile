@@ -1,4 +1,4 @@
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 
 top_srcdir = ../..
@@ -16,8 +16,8 @@ HOST_TOOLS = host
 
 VPATH = .:$(top_srcdir)/$(subdir):$(top_srcdir)/tools/lib:$(top_srcdir)/lib
 
-CC = gcc
-CXX = c++
+CC = /usr/bin/gcc
+CXX = /usr/bin/g++
 AR_CREATE = ar cru
 RANLIB = ranlib
 BUILD_CC = 

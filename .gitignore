@@ -3,7 +3,7 @@
 tools/click-align/click-align
 tools/click-check/click-check
 tools/click-combine/click-combine
-tools/click-uncombine/click-uncombine
+tools/click-combine/click-uncombine
 tools/click-devirtualize/click-devirtualize
 tools/click-fastclassifier/click-fastclassifier
 tools/click-flatten/click-flatten
@@ -12,7 +12,7 @@ tools/click-pretty/click-pretty
 tools/click-undead/click-undead
 tools/click-xform/click-xform
 tools/click2xml/click2xml
-tools/xml2click/xml2click
+tools/click2xml/xml2click
 tools/lib/*.hd
 userlevel/click
 userlevel/elements.cc

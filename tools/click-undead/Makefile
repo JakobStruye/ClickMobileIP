@@ -1,4 +1,4 @@
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 
 top_srcdir = ../..
@@ -19,8 +19,8 @@ CXX =
 LIBCLICKTOOL = libclicktool_build.a
 DL_LIBS = 
 else
-CC = gcc
-CXX = c++
+CC = /usr/bin/gcc
+CXX = /usr/bin/g++
 LIBCLICKTOOL = libclicktool.a
 DL_LIBS = -ldl
 endif

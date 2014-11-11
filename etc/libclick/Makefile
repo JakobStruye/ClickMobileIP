@@ -1,7 +1,7 @@
 # Warning: this file must be usable by regular make
 # (unlike the Makefiles in subdirectories).
 
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 
 PACKAGE = click
@@ -13,7 +13,7 @@ top_builddir = ../..
 subdir = etc/libclick
 conf_auxdir = $(top_srcdir)
 
-AUTOCONF = $(conf_auxdir)/missing autoconf
+AUTOCONF = autoconf
 ACLOCAL = aclocal -I m4
 PERL = perl
 INSTALL = /usr/bin/install -c
