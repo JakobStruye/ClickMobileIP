@@ -36,7 +36,6 @@ void ForeignReplyProcess::push(int, Packet *p){
     }
     click_udp* udp_header = (click_udp*) (ip_header+1);
     if (ntohs(udp_header->uh_sport) != 434) {
-        //click_chatter("NOT A REGISTER FORREP");
         output(0).push(p);
         return;
     }
@@ -47,7 +46,7 @@ void ForeignReplyProcess::push(int, Packet *p){
     }
     //ip_header->ip_src = ip_header->ip_dst;
     //ip_header->ip_dst = reply->home_address;
-    //click_chatter("FORREP %s %i %s %i", IPAddress(ip_header->ip_src).unparse().c_str(), ntohs(udp_header->uh_sport),IPAddress(ip_header->ip_dst).unparse().c_str(), ntohs(udp_header->uh_dport));
+    //click_chatter("Foreign Agent: Registration Reply detected");
     output(1).push(q);
 }
 

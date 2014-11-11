@@ -58,7 +58,7 @@ Packet* RegistrationRequestSender::makePacket() {
 	int packetsize = sizeof(RegistrationRequest);
 	int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
 	WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
-	if (packet == 0) click_chatter("cannot make packet!");
+	if (packet == 0) //click_chatter("cannot make packet!");
 	memset(packet->data(), 0, packet->length());
 	RegistrationRequest* format = (RegistrationRequest*) packet->data();
 	format->type = 1; //fixed
@@ -84,16 +84,24 @@ Packet* RegistrationRequestSender::makePacket() {
     format->identification[0] = htonl(1000);
     format->identification[1] = htonl(1100);
 
+    if (isHome) {
+        //click_chatter("Mobile Node: DEregistration request created");
+    }
+    else {
+        //click_chatter("Mobile Node: Registration request created");
+    }
+
 	return packet;
 }
 
 void RegistrationRequestSender::run_timer(Timer *) {
+  //TODO remove once advertisements are implemented
   if (isHome)
       gateway = IPAddress("192.168.2.254");
   else
       gateway = IPAddress("192.168.3.254");
   if (Packet *q = makePacket()) {
-        //click_chatter("Timer is go");
+
         PendingRegistration* entry = new PendingRegistration();
         entry->mobile_MAC[0] = 0;
         entry->mobile_MAC[1] = 80;
@@ -118,6 +126,7 @@ void RegistrationRequestSender::run_timer(Timer *) {
         entry->remaining_lifetime = entry->lifetime;
         _pendingRegistrations.push_back(entry);
         isHome = (!isHome);
+        //click_chatter("Mobile Node: Pending Registration entry created");
         output(0).push(q); }
   _timer.reschedule_after_msec(5000);
 }
@@ -146,8 +155,8 @@ void RegistrationRequestSender::push(int, Packet *p){
     PendingRegistration* entry = getEntry(ntohl(rep->identification[1]));
     gateway = IPAddress(entry->dst);
     deleteEntry(entry);
-    delete entry;
-	//click_chatter("ACCEPTED");
+    //delete entry;
+	//click_chatter("Mobile Node: Registration Reply received");
 	output(1).push(p);
 }
 

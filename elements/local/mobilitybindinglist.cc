@@ -45,14 +45,14 @@ void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
 }
 
 void MobilityBindingList::printList() {
-    click_chatter("Mobility Binding List: \n");
+    //click_chatter("Mobility Binding List: \n");
     for (std::list<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++) {
         const char* home_address = (IPAddress((*it)->home_address).unparse()).c_str();
-        click_chatter("home_address %s", home_address);
+        //click_chatter("home_address %s", home_address);
         const char* care_of_address = (IPAddress((*it)->care_of_address).unparse()).c_str();
-        click_chatter("care_of_address %s", care_of_address);
-        click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
-        click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
+        //click_chatter("care_of_address %s", care_of_address);
+        //click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
+        //click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
 
     }
 }
@@ -67,7 +67,7 @@ void MobilityBindingList::printList() {
  * Output 0: Packet from Input 1 with IP addresses set
  * Output 1: Unchanged packets from Input 2, to be tunneled
  * Output 2: Unchanged packets from Input 0
- * Output 3: Unchanged packets frfom Input 2, not to be tunneled
+ * Output 3: Unchanged packets from Input 2, not to be tunneled
  */
 
 void MobilityBindingList::push(int input, Packet *p){
@@ -78,10 +78,8 @@ void MobilityBindingList::push(int input, Packet *p){
         if (ip_header->ip_p == 17) { //UDP
             click_udp* udp_header = (click_udp*) (ip_header+1);
 
-            //click_chatter("MOBBDIND %i",ntohs(udp_header->uh_dport));
             if (ntohs(udp_header->uh_dport) == 434) { //Registration
 
-                //click_chatter("Mob got req");
 
                 RegistrationRequest* req = (RegistrationRequest*) (udp_header+1);
                 //Only one binding per mobile node allowed, so all cases
@@ -101,6 +99,7 @@ void MobilityBindingList::push(int input, Packet *p){
                     insertEntry(newEntry);
                 }
                 //printList();
+                //click_chatter("Home Agent: Mobility Binding created");
                 //Propagate unchanged packet
                 output(2).push(p);
                 return;
@@ -111,9 +110,10 @@ void MobilityBindingList::push(int input, Packet *p){
         //Not a registration
         click_ip* ip_header = (click_ip*) (q->data());
         MobilityBindingListEntry* entry = getEntry(ip_header->ip_dst);
-        //click_chatter("CHECKING IF TO BE ENCAPSD");
-        if (entry) //to be encapsulated
+        if (entry) { //to be encapsulated
+            //click_chatter("Home Agent: Packet to be tunneled detected");
             output(1).push(p);
+        }
         else
             output(3).push(p);
     }
@@ -123,6 +123,7 @@ void MobilityBindingList::push(int input, Packet *p){
         MobilityBindingListEntry* entry = getEntry(ip_inner_header->ip_dst);
         ip_outer_header->ip_dst = entry->care_of_address;
         ip_outer_header->ip_src = ip_inner_header->ip_dst;
+        //click_chatter("Home Agent: Outer IP header of ip-in-ip packet set");
         output(0).push(q);
 
     }

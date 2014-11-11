@@ -1,0 +1,43 @@
+Telecommunicatiesystemen: Mobile IP in Click Modular Router
+===========================================================
+
+Daniel Frenkel    Jakob Struye
+20120710          20120612
+-------------------------------
+
+Tussentijdse evaluatie
+------------------------------------------------------
+
+1) Geïmplementeerde features
+============================
+  -Correctie registration requests met vast ingestelde velden worden verstuurd en ontvangen. Registration replies met velden afhankelijk van ontvangen requests worden verstuurd. De agents en mobile node nemen aan dat de requests en replies valid zijn, en passen de berichten correct aan.
+
+  -In Mobile Node, Foreign Agent en Home Agent worden respectievelijk een pending registration list, visitor list en mobile binding list bijgehouden. Deze worden correct ingevuld afhankelijk van ontvangen registration requests en replies (behalve remaining lifetime)
+
+  -Registration requests worden getriggerd door een timer (gezien er nog geen advertisements verstuurd worden). Als de timing van de mobility emulator aangepast wordt, moet deze timer ook aangepast worden. Door het gebrek aan advertisements, wordt de routing table nu nog handmatig aangepast voor het verzenden van een request. Eens advertisements geïmplementeerd zijn, kan de informatie hieruit gebruikt worden en zal de routing table van de mobile node pas bij het ontvangen van een reply aangepast worden.
+
+  -Indien de home agent te tunnelen packets ontvangt, wordt dit correct gedaan en detunnelt de ontvangende foreign agent ze correct. Ze worden ook correct naar de mobile node doorgestuurd.
+
+  -Alle checksums (IP en UDP) zijn correct, gecontroleerd met Wireshark.
+
+  -De pings van ipnetwork.click worden in beide situaties (mobile node al dan niet home) beantwoord.
+
+2) Nog te implementeren features
+================================
+  -Alles wat vermeld staat bij "eindevalutie" in de opgave: het versturen en afhandelen van advertisements, het aftellen van de remaining lifetime en gevolgen (verwijderen van entries, registratie herhalen), dynamische registraties.
+
+3) Enkele opmerkingen bij de code
+=================================
+-We gebruiken momenteel de C++ standard library, indien nodig kunnen we dat nog veranderen naar de Click standard library
+
+-De code is getest en werkend bevonden op een cleane install van Click op het referentieplatform.
+
+-Click waarschuwt voor expensive packet::push, dit kan opgelost worden door in include/click/packet.hh de default_headroom aan te passen van 28 naar (bijvoorbeeld) 48. De default_headroom van 28 wordt gebruikt door de ICMPPingSource, maar dit is niet voldoende voor een tweede IP header (voor tunneling) en een Ethernet header. Indien dit niet aangepast wordt, zal de code nog steeds werken maar een waarschuwing geven.
+
+-Door het toevoegen van features aan elementen zijn sommige elementen wat groter dan voorzien geworden, met wat veel inputs en outputs. Om dit wat te verduidelijken, hebben we boven de pushfunctie van elk element een lijstje geplaatst met wat in elke input verwacht wordt, wat ermee gebeurt en wat uit de outputs komt. We zijn nog van plan om de elementen nog wat duidelijker/eenvoudiger te maken (en evt. verder op te splitsen) tegen de eindevaluatie. Op sommige plekken kunnen features van eigen elementen nog vervangen worden door ingebouwde elementen, en het gebruik van handlers (zie volgend punt) zou ook nog wat dingen makkelijker moeten maken.
+
+-We zijn pas naar het einde van het ontwikkelen van de testversie het gebruik van handlers beginnen overwegen, heel wat code zou dus vereenvoudigd kunnen worden door het gebruik van handlers, we plannen dit te doen tegen de eindevaluatie.
+
+-In elements/unfinished_unused/ zitten nog een aantal elementen die we nog moeten afwerken en/of niet gebruikt worden. Ze worden niet gecompileerd en zijn er enkel voor de volledigheid bijgeplaatst.
+
+-Er is heel wat output voorzien in de elementen om te volgen wat er precies aan het gebeuren is. Standaard staat de output uitgecomment. Om de output makkelijk aan- en uit te zetten, zijn de scriptjes addoutput en removeoutput voorzien. Wees voorzichtig bij het runnen van de scripts; als het removescript meerdere keren na elkaar gerund wordt, zal het addscript ook meerdere keren moeten worden gerund om de output terug te krijgen! Deze output zou moeten volstaan om de werking van onze code aan te tonen.

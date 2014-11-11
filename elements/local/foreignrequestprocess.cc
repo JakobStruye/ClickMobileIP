@@ -24,10 +24,10 @@ int ForeignRequestProcess::configure(Vector<String> &conf, ErrorHandler *errh) {
 Packet* ForeignRequestProcess::makeReply() {
     //TODO IMPLEMENT
     int packetsize = sizeof(RegistrationRequest);
- //click_chatter("%i", packetsize);
+ ////click_chatter("%i", packetsize);
     int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_icmp) + sizeof(click_ether);
     WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
-    if (packet == 0) click_chatter("cannot make packet!");
+    if (packet == 0) //click_chatter("cannot make packet!");
     /*memset(packet->data(), 0, packet->length());
     RegistrationRequest* format = (RegistrationRequest*) packet->data();
     format->type = 1; //fixed
@@ -70,7 +70,8 @@ void ForeignRequestProcess::push(int, Packet *p){
     ip_header->ip_dst = req->home_agent;
     udp_header->uh_sport = htons(1234); //random?
     udp_header->uh_dport = htons(434);
-    //click_chatter("Hier %s", IPAddress(ip_header->ip_dst).unparse().c_str());
+    //click_chatter("Foreign Agent: Registration Request detected");
+    //click_chatter("Foreign Agent: Registration Request modified");
     output(0).push(q);
 }
 

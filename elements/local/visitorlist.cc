@@ -53,20 +53,19 @@ void VisitorList::deleteEntry(VisitorListEntry* entry) {
 }
 
 void VisitorList::printList() {
-    click_chatter("Visitor List: \n");
+    //click_chatter("Visitor List: \n");
     for (std::list<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++) {
 
-        click_chatter("MAC %i:%i:%i:%i:%i:%i", (*it)->mobile_MAC[0], (*it)->mobile_MAC[0], (*it)->mobile_MAC[1],
-                (*it)->mobile_MAC[2], (*it)->mobile_MAC[3], (*it)->mobile_MAC[4], (*it)->mobile_MAC[5]);
+        //click_chatter("MAC %i:%i:%i:%i:%i:%i", (*it)->mobile_MAC[0], (*it)->mobile_MAC[0], (*it)->mobile_MAC[1],  (*it)->mobile_MAC[2], (*it)->mobile_MAC[3], (*it)->mobile_MAC[4], (*it)->mobile_MAC[5]);
         const char* ip_src = (IPAddress((*it)->ip_src).unparse()).c_str();
-        click_chatter("src %s", ip_src);
+        //click_chatter("src %s", ip_src);
         const char* ip_dst = (IPAddress((*it)->ip_dst).unparse()).c_str();
-        click_chatter("dst %s", ip_dst);
+        //click_chatter("dst %s", ip_dst);
         const char* home_agent = (IPAddress((*it)->home_agent).unparse()).c_str();
-        click_chatter("home_agent %s", home_agent);
-        click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
-        click_chatter("lifetime %i", (*it)->lifetime);
-        click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
+        //click_chatter("home_agent %s", home_agent);
+        //click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
+        //click_chatter("lifetime %i", (*it)->lifetime);
+        //click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
 
     }
 
@@ -88,13 +87,14 @@ void VisitorList::push(int input, Packet *p){
     click_ether* eth_header = (click_ether*) (q->data());
     click_ip* ip_header = (click_ip*) (eth_header+1);
     if (input == 2) {
+        //click_chatter("Foreign Agent: Detunneled packet received");
         VisitorListEntry* entry = getEntry(ip_header->ip_dst);
         //Error if !entry
         /*if (!entry)
-            click_chatter("FOREIGN DOES NOT KNOW MOBILE NODE");*/
+            ...*/
         for(int i = 0; i < 6; i++)
             eth_header->ether_dhost[i] = entry->mobile_MAC[i];
-        //click_chatter("DECAPSD ETH SET");
+        //click_chatter("Foreign Agent: dst MAC of detunneled packet set");
         output(2).push(q);
         return;
     }
@@ -125,6 +125,7 @@ void VisitorList::push(int input, Packet *p){
 
         insertEntry(entry);
         //printList();
+        //click_chatter("Foreign Agent: Visitor List entry created for Registration Request");
         output(0).push(q);
     }
     else if (input == 1){
@@ -138,7 +139,8 @@ void VisitorList::push(int input, Packet *p){
         ip_header->ip_dst = entry->ip_src;
         udp_header->uh_sport = htons(434);
         udp_header->uh_dport = htons(entry->port_src);
-        //click_chatter("PORTS %i %i", ntohs(udp_header->uh_sport), ntohs(udp_header->uh_dport));
+        //click_chatter("Foreign Agent: Visitor List updated after receiving Registration Reply");
+        //click_chatter("Foreign Agent: Received Registration Reply modified");
         output(1).push(q);
 
     }
