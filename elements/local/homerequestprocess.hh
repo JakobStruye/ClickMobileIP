@@ -7,7 +7,7 @@
 #include <clicknet/ether.h>
 #include "registrationrequest.hh"
 #include "registrationreply.hh"
-#include <queue>
+#include <click/dequeue.hh>
 
 CLICK_DECLS
 
@@ -25,7 +25,7 @@ class HomeRequestProcess : public Element {
         void push(int, Packet *);
 
     private:
-        std::queue<Packet*> requests;
+        DEQueue<Packet*> requests;
 
 };
 

@@ -1,13 +1,14 @@
+#include <iostream>
+
 #include <click/config.h>
 #include <click/confparse.hh>
 #include <click/error.hh>
 #include "foreignrequestprocess.hh"
-#include <iostream>
 
 
 CLICK_DECLS
 ForeignRequestProcess::ForeignRequestProcess(){
-
+    _addrs = Vector<String>();
 }
 
 ForeignRequestProcess::~ ForeignRequestProcess()
@@ -19,36 +20,58 @@ int ForeignRequestProcess::configure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 
-
-
-Packet* ForeignRequestProcess::makeReply() {
-    //TODO IMPLEMENT
-    int packetsize = sizeof(RegistrationRequest);
- ////click_chatter("%i", packetsize);
-    int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_icmp) + sizeof(click_ether);
-    WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
-    if (packet == 0) //click_chatter("cannot make packet!");
-    /*memset(packet->data(), 0, packet->length());
-    RegistrationRequest* format = (RegistrationRequest*) packet->data();
-    format->type = 1; //fixed
-  format->flags[0] = 0; //S
-  format->flags[1] = 0; //B
-  format->flags[2] = 0; //D
-  format->flags[3] = 0; //M
-  format->flags[4] = 0; //G
-  format->flags[5] = 0; //r, should be 0
-  format->flags[6] = 0; //T
-  format->flags[7] = 0; //x, should be 0 but will be ignored
-  format->lifetime = htons(300);
-  format->home_address = IPAddress("192.168.1.1").in_addr(); //192.168.1.1
-  format->home_agent = IPAddress("192.168.1.2").in_addr(); //192.168.1.2
-  format->care_of_address = IPAddress("192.168.2.1").in_addr(); //192.168.2.1
-  format->identification[0] = htonl(1000);
-  format->identification[1] = htonl(1100);*/
-
-    return packet;
+int ForeignRequestProcess::addOwnIP(const String& conf, Element* e, void* thunk, ErrorHandler* errh) {
+    ForeignRequestProcess* me = (ForeignRequestProcess*) e;
+    IPAddress new_addr;
+    if (cp_va_kparse(conf, me, errh, "IP", cpkM, cpIPAddress, &new_addr,cpEnd) < 0) return -1;
+    me->_addrs.push_back(new_addr.unparse());
+    return 0;
 }
 
+void ForeignRequestProcess::add_handlers() {
+    add_write_handler("addOwnIP", &addOwnIP, (void*) 0);
+}
+
+
+WritablePacket* ForeignRequestProcess::makeReply(RegistrationRequest* request, int errcode) {
+    //Converts the request into a reply
+    //int headroom = sizeof(click_ether);
+    //int packetsize = sizeof(click_udp) + sizeof(click_ip) + sizeof(RegistrationReply);
+    int headroom =  sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
+    int packetsize = sizeof(RegistrationReply);
+    WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
+    if (packet == 0) //click_chatter("cannot make packet!");
+    memset(packet->data(), 0, packet->length());
+//    click_ether* eth_header = (click_ether*) req->data();
+//    for(int i = 0; i < 6; i++) {
+//        uint8_t temp = eth_header->ether_dhost[i];
+//        eth_header->ether_dhost[i] = eth_header->ether_shost[i];
+//        eth_header->ether_shost[i] = temp;
+//    }
+//    click_ip* ip_header_req = (click_ip*) req->data();
+//    click_ip* ip_header_rep = (click_ip*) packet->data();
+//    ip_header_rep->ip_p = ip_header_req->ip_p;
+//    ip_header_rep->ip_v = ip_header_req->ip_v;
+//    ip_header_rep->ip_hl = ip_header_req->ip_hl;
+//    ip_header_rep->ip_src = ip_header_req->ip_dst;
+//    ip_header_rep->ip_dst = ip_header_req->ip_src;
+//    click_udp* udp_header_req = (click_udp*) (ip_header_req+1);
+//    click_udp* udp_header_rep = (click_udp*) (ip_header_rep+1);
+//    udp_header_rep->uh_dport = udp_header_req->uh_sport;
+//    udp_header_rep->uh_sport = udp_header_req->uh_dport;
+    RegistrationReply* reply = (RegistrationReply*) (packet->data());
+
+    reply->type = 3; //fixed
+    reply->code = errcode;
+    reply->lifetime = request->lifetime;
+    reply->home_address = request->home_address;
+    reply->home_agent = request->home_agent;
+    //uint32_t tempIdentification = request->identification[1];
+    //click_chatter("%i %i", ntohl(request->identification[0]), ntohl(request->identification[1]) );
+    reply->identification[0] = request->identification[0];
+    reply->identification[1] = request->identification[1];
+    return packet; //now a reply, with some gibberish at the end which should be truncated
+}
 /**
  * Expects Registration Requests in IP
  *
@@ -65,6 +88,19 @@ void ForeignRequestProcess::push(int, Packet *p){
     if (req->type != 1) {
         output(0).push(p);
         return;
+    }
+    for (Vector<String>::iterator it = _addrs.begin(); it != _addrs.end(); it++) {
+        //click_chatter((*it).c_str());
+        //click_chatter(IPAddress(req->home_agent).unparse().c_str());
+        //std::cout << req->home_address << std::endl;
+        if (*it == IPAddress(req->home_agent).unparse()) {
+            //home address is interface of this foreign agent
+            //click_chatter("DENIED");
+            Packet* reply = makeReply(req, 136);
+            //click_chatter("CONVERTED");
+            output(1).push(reply);
+            return;
+        }
     }
     ip_header->ip_src = ip_header->ip_dst;
     ip_header->ip_dst = req->home_agent;

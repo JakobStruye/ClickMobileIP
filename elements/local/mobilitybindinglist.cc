@@ -7,7 +7,7 @@
 
 CLICK_DECLS
 MobilityBindingList::MobilityBindingList(){
-    mobilityList = std::list<MobilityBindingListEntry*>();
+    mobilityList = Vector<MobilityBindingListEntry*>();
 
 }
 
@@ -20,7 +20,7 @@ int MobilityBindingList::configure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 MobilityBindingListEntry* MobilityBindingList::getEntry(in_addr home_address) {
-    for(std::list<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++)
+    for(Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++)
         if ((*it)->home_address == home_address)
             return (*it);
 
@@ -32,7 +32,7 @@ void MobilityBindingList::insertEntry(MobilityBindingListEntry* entry) {
 }
 
 void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
-    std::list<MobilityBindingListEntry*>::iterator it = mobilityList.begin();
+    Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin();
     while (it != mobilityList.end()) {
         if (*it == entry) {
             mobilityList.erase(it);
@@ -46,7 +46,7 @@ void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
 
 void MobilityBindingList::printList() {
     //click_chatter("Mobility Binding List: \n");
-    for (std::list<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++) {
+    for (Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++) {
         const char* home_address = (IPAddress((*it)->home_address).unparse()).c_str();
         //click_chatter("home_address %s", home_address);
         const char* care_of_address = (IPAddress((*it)->care_of_address).unparse()).c_str();

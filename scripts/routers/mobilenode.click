@@ -17,7 +17,9 @@ $addr_info, $gateway
 	-> rt :: LinearIPLookup(
 		$addr_info:ip/32 0,
 		$addr_info:ipnet 1,
+    255.255.255.255/255.255.255.255 0,
 		0.0.0.0/0.0.0.0 $gateway 1);
+
 	
 	// ARP responses are copied to each ARPQuerier and the host.
 	arpt :: Tee(1);
@@ -26,7 +28,7 @@ $addr_info, $gateway
 	c0 :: Classifier(12/0806 20/0001, 12/0806 20/0002, -);
 	input[0] -> HostEtherFilter($addr_info:eth) -> c0;
 	c0[0] -> ar0 :: ARPResponder($addr_info) -> [0]output;
-	arpq0 :: ARPQuerier($addr_info) -> [0]output;
+	arpq0 :: ARPQuerier($addr_info) -> ToDump("test.dump") -> [0]output;
 	c0[1] -> arpt;
 	arpt[0] -> [1]arpq0;
 	c0[2] -> Paint(1) -> ip;
@@ -44,10 +46,12 @@ $addr_info, $gateway
 	// Local delivery
 	rt[0] ->
   //Check if Reply, and process it if so
+  Unstrip(14) ->
   [0]request[1] ->
+  Strip(14) ->
   //Change the routing table according to new Reply (will leave it unchanged if it was not a Reply)
   Script(TYPE PACKET, set gw $(request.gateway), write rt.remove 0.0.0.0/0.0.0.0, write rt.add 0.0.0.0/0.0.0.0 $gw 1) ->
-  //To ICMPPingReponder (RegistrationReply and other non ICMPPingRequests will be discarded there)
+  //To ICMPPingResponder (RegistrationReply and other non ICMPPingRequests will be discarded there)
   [1]output; 
 	
 	// Forwarding path for eth0

@@ -1,7 +1,7 @@
 #ifndef VISITORLIST_HH_
 #define VISITORLIST_HH_
 
-#include <list>
+#include <click/vector.cc>
 #include <click/element.hh>
 #include <clicknet/udp.h>
 #include <clicknet/icmp.h>
@@ -30,7 +30,7 @@ class VisitorList : public Element {
 
         void push(int, Packet *);
     private:
-        std::list<VisitorListEntry*> visList;
+        Vector<VisitorListEntry*> visList;
         in_addr ipAddr;
 
 

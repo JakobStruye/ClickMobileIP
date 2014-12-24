@@ -12,6 +12,7 @@ $private_address, $public_address, $default_gateway
   mob :: MobilityBindingList()
   reqtorep :: HomeRequestProcess;
   enc :: Encapsulator(SRC $private_address:ip);
+  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0);
 
 	// Shared IP input path and routing table
 	ip :: Strip(14)
@@ -70,6 +71,13 @@ $private_address, $public_address, $default_gateway
 
   //Tunneling this would cause loops, send to output 2 to be discarded
   enc[1] -> [2]output;
+
+  advertise
+  -> IPEncap(1, $private_address:ip, 255.255.255.255, TTL 1)
+  -> SetIPChecksum
+  -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)
+  -> [0]output;	
+
 	
 	// Forwarding path for eth0
 	rt[1] 

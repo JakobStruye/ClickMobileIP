@@ -7,7 +7,7 @@
 
 CLICK_DECLS
 VisitorList::VisitorList(){
-    visList = std::list<VisitorListEntry*>();
+    visList = Vector<VisitorListEntry*>();
 
 }
 
@@ -20,7 +20,7 @@ int VisitorList::configure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 VisitorListEntry* VisitorList::getEntry(uint32_t identification) {
-    for(std::list<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++)
+    for(Vector<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++)
         if ((*it)->identification[1] == identification)
             return (*it);
 
@@ -28,7 +28,7 @@ VisitorListEntry* VisitorList::getEntry(uint32_t identification) {
 }
 
 VisitorListEntry* VisitorList::getEntry(in_addr ip_src) {
-    for(std::list<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++)
+    for(Vector<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++)
         if ((*it)->ip_src == ip_src)
             return (*it);
 
@@ -40,7 +40,7 @@ void VisitorList::insertEntry(VisitorListEntry* entry) {
 }
 
 void VisitorList::deleteEntry(VisitorListEntry* entry) {
-    std::list<VisitorListEntry*>::iterator it = visList.begin();
+    Vector<VisitorListEntry*>::iterator it = visList.begin();
     while (it != visList.end()) {
         if (*it == entry) {
             visList.erase(it);
@@ -54,7 +54,7 @@ void VisitorList::deleteEntry(VisitorListEntry* entry) {
 
 void VisitorList::printList() {
     //click_chatter("Visitor List: \n");
-    for (std::list<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++) {
+    for (Vector<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++) {
 
         //click_chatter("MAC %i:%i:%i:%i:%i:%i", (*it)->mobile_MAC[0], (*it)->mobile_MAC[0], (*it)->mobile_MAC[1],  (*it)->mobile_MAC[2], (*it)->mobile_MAC[3], (*it)->mobile_MAC[4], (*it)->mobile_MAC[5]);
         const char* ip_src = (IPAddress((*it)->ip_src).unparse()).c_str();
@@ -131,7 +131,10 @@ void VisitorList::push(int input, Packet *p){
     else if (input == 1){
         RegistrationReply* reply = (RegistrationReply*) (udp_header+1);
         VisitorListEntry* entry = getEntry(ntohl(reply->identification[1]));
-        entry->lifetime = std::min(entry->lifetime, ntohs(reply->lifetime));
+        if (!entry)
+            //click_chatter("%i", ntohl(reply->identification[1]));
+        if (entry->lifetime > ntohs(reply->lifetime))
+          entry->lifetime = ntohs(reply->lifetime);
         //Set remaining lifetime
         for(int i = 0; i < 6; i++)
             eth_header->ether_dhost[i] = entry->mobile_MAC[i];

@@ -1,7 +1,6 @@
 #ifndef ENCAPSULATOR_HH_
 #define ENCAPSULATOR_HH_
 
-#include <list>
 #include <click/element.hh>
 #include <clicknet/udp.h>
 #include <clicknet/icmp.h>

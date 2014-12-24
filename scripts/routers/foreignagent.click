@@ -8,6 +8,12 @@ elementclass ForeignAgent
 $private_address, $public_address, $default_gateway
 |
   vis :: VisitorList(IP $private_address);
+  advertise :: AgentAdvertisementSender(IP 192.168.3.254, HOME 0, FOREIGN 1);
+  forreq :: ForeignRequestProcess();
+
+  Script(write forreq.addOwnIP IP $private_address:ip)
+  Script(write forreq.addOwnIP IP $public_address:ip)
+  //Script(write forreq.addOwnIP IP 192.168.3.254)
 
 
 	// Shared IP input path and routing table
@@ -62,7 +68,7 @@ $private_address, $public_address, $default_gateway
   //Check if Registration Reply or Request
   -> forrep::ForeignReplyProcess[0] //on this output if not Reply
   //Must be Request then, change IP addresses and UDP ports
-  -> ForeignRequestProcess 
+  -> forreq[0]
   -> GetIPAddress(IP dst) 
   -> SetIPChecksum -> SetUDPChecksum -> rt; 
 
@@ -85,7 +91,21 @@ $private_address, $public_address, $default_gateway
   
   //Fixes error of nonexistent output
   Idle -> [2]output
-	
+
+  advertise
+  -> IPEncap(1, $private_address:ip, 255.255.255.255, TTL 1)
+  -> SetIPChecksum
+  -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)
+  -> [0]output;	
+
+  //Forwarding replies (requests denied) generated here
+  forreq[1]
+  -> UDPIPEncap($private_address:ip, 434, 2.2.2.2, 434) //All values placeholder
+  -> EtherEncap(0x0800, $private_address:ether, 1:1:1:1:1:1)
+  //Set Ethernet dst, UDP src/dst, UDP ports
+  -> [1]vis
+
+
 	// Forwarding path for eth0
 	rt[1] -> DropBroadcasts
 	-> cp0 :: PaintTee(1)

@@ -2,7 +2,7 @@
 #define MOBILITYBINDINGLIST_HH_
 
 
-#include <list>
+#include <click/vector.hh>
 #include <click/element.hh>
 #include <clicknet/udp.h>
 #include <clicknet/icmp.h>
@@ -29,7 +29,7 @@ class MobilityBindingList : public Element {
 
         void push(int, Packet *);
     private:
-        std::list<MobilityBindingListEntry*> mobilityList;
+        Vector<MobilityBindingListEntry*> mobilityList;
 
 
 

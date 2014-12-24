@@ -7,7 +7,7 @@
 
 CLICK_DECLS
 HomeRequestProcess::HomeRequestProcess(){
-requests = std::queue<Packet*>();
+requests = DEQueue<Packet*>();
 }
 
 HomeRequestProcess::~ HomeRequestProcess()
@@ -59,7 +59,7 @@ void HomeRequestProcess::push(int input, Packet *p){
         RegistrationRequest * req = (RegistrationRequest*) (udp_header+1);
         WritablePacket* q = makeReply(req);
         RegistrationReply* rep = (RegistrationReply*) (q->data());
-        requests.push(p);
+        requests.push_back(p);
         //click_chatter("Home Agent: Registration Reply created");
         output(1).push(q);
     }
@@ -70,7 +70,7 @@ void HomeRequestProcess::push(int input, Packet *p){
         click_udp* udp_header_reply = (click_udp*) (ip_header_reply+1);
         RegistrationReply * rep = (RegistrationReply*) (udp_header_reply+1);
         Packet* request = requests.front();
-        requests.pop();
+        requests.pop_front();
         click_ip* ip_header_request = (click_ip*) (request->data());
         click_udp* udp_header_request = (click_udp*) (ip_header_request+1);
         ip_header_reply->ip_src = ip_header_request->ip_dst;

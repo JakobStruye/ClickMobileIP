@@ -5,10 +5,13 @@
 #include <clicknet/icmp.h>
 #include <clicknet/ether.h>
 #include <click/timer.hh>
-#include <list>
+#include <click/vector.cc>
 #include "registrationrequest.hh"
 #include "registrationreply.hh"
 #include "pendingregistration.hh"
+#include "agentadvertisement.hh"
+#include "savedadvertisement.hh"
+
 
 
 CLICK_DECLS
@@ -30,8 +33,10 @@ class RegistrationRequestSender : public Element {
         static String getGateway(Element*, void*);
         void add_handlers();
 
+        SavedAdvertisement* getEntry(in_addr);
 
-		Packet* makePacket();
+
+		Packet* makePacket(in_addr care_of);
         void run_timer(Timer *);
 		void push(int, Packet *);
 
@@ -39,8 +44,15 @@ class RegistrationRequestSender : public Element {
 
 	private:
 	    Timer _timer;
-	    bool isHome;
-	    std::list<PendingRegistration*> _pendingRegistrations;
+	    bool _isRegistered;
+	    Vector<PendingRegistration*> _pendingRegistrations;
+        Vector<SavedAdvertisement*> _savedAdvertisements;
+
+	    unsigned _remaining_lifetime;
+
+	    in_addr _home_agent;
+	    in_addr _home_address;
+	    in_addr _care_of_address;
 
 
 };
