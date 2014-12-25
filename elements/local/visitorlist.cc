@@ -6,7 +6,7 @@
 #include <cmath>
 
 CLICK_DECLS
-VisitorList::VisitorList(){
+VisitorList::VisitorList() : _timer(this){
     visList = Vector<VisitorListEntry*>();
 
 }
@@ -17,6 +17,27 @@ VisitorList::~ VisitorList()
 int VisitorList::configure(Vector<String> &conf, ErrorHandler *errh) {
     if (cp_va_kparse(conf, this, errh, "IP", cpkM, cpIPAddress, &ipAddr,  cpEnd) < 0) return -1;
     return 0;
+}
+
+int VisitorList::initialize(ErrorHandler *errh) {
+    _timer.initialize(this);
+    _timer.schedule_after_msec(100);
+    return 0;
+}
+
+void VisitorList::run_timer(Timer*) {
+    Vector<VisitorListEntry*>::iterator it = visList.begin();
+    while (it != visList.end()) {
+        (*it)->remaining_lifetime--;
+        if (!(*it)->remaining_lifetime) {
+            click_chatter("Foreign agent: erasing entry from visitor list");
+            it = visList.erase(it);
+        }
+        else {
+            it++;
+        }
+    }
+    _timer.reschedule_after_msec(1000);
 }
 
 VisitorListEntry* VisitorList::getEntry(uint32_t identification) {
@@ -111,6 +132,9 @@ void VisitorList::push(int input, Packet *p){
     }
     RegistrationRequest* req = (RegistrationRequest*) (udp_header+1);
     if (input == 0 && req->type == 1) {
+        VisitorListEntry* oldEntry = getEntry(ip_header->ip_src);
+        if (oldEntry)
+            deleteEntry(oldEntry);
         VisitorListEntry* entry = new VisitorListEntry;
         for(int i = 0; i < 6; i++)
             entry->mobile_MAC[i] = eth_header->ether_shost[i];

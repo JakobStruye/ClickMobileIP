@@ -30,6 +30,7 @@ void MobilityBindingList::run_timer(Timer *) {
     while(it != mobilityList.end()) {
         (*it)->remaining_lifetime--;
         if (!(*it)->remaining_lifetime) {
+            click_chatter("Home agent: erasing entry from mobile bindings list");
             it = mobilityList.erase(it);
         }
         else {

@@ -6,6 +6,7 @@
 #include <clicknet/udp.h>
 #include <clicknet/icmp.h>
 #include <clicknet/ether.h>
+#include <click/timer.hh>
 #include "registrationrequest.hh"
 #include "registrationreply.hh"
 #include "visitorlistentry.hh"
@@ -20,9 +21,12 @@ class VisitorList : public Element {
         const char *port_count() const  { return "3/3"; }
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
+        int initialize(ErrorHandler*);
 
         VisitorListEntry* getEntry(uint32_t);
         VisitorListEntry* getEntry(in_addr);
+
+        void run_timer(Timer*);
 
         void insertEntry(VisitorListEntry*);
         void deleteEntry(VisitorListEntry*);
@@ -32,6 +36,8 @@ class VisitorList : public Element {
     private:
         Vector<VisitorListEntry*> visList;
         in_addr ipAddr;
+
+        Timer _timer;
 
 
 
