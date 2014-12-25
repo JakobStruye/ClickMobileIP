@@ -45,14 +45,14 @@ void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
 }
 
 void MobilityBindingList::printList() {
-    //click_chatter("Mobility Binding List: \n");
+    click_chatter("Mobility Binding List: \n");
     for (Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++) {
         const char* home_address = (IPAddress((*it)->home_address).unparse()).c_str();
-        //click_chatter("home_address %s", home_address);
+        click_chatter("home_address %s", home_address);
         const char* care_of_address = (IPAddress((*it)->care_of_address).unparse()).c_str();
-        //click_chatter("care_of_address %s", care_of_address);
-        //click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
-        //click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
+        click_chatter("care_of_address %s", care_of_address);
+        click_chatter("identification %i %i", (*it)->identification[0], (*it)->identification[1]);
+        click_chatter("remaining lifetime %i", (*it)->remaining_lifetime);
 
     }
 }
@@ -99,7 +99,7 @@ void MobilityBindingList::push(int input, Packet *p){
                     insertEntry(newEntry);
                 }
                 //printList();
-                //click_chatter("Home Agent: Mobility Binding created");
+                click_chatter("Home Agent: Mobility Binding created");
                 //Propagate unchanged packet
                 output(2).push(p);
                 return;
@@ -111,7 +111,7 @@ void MobilityBindingList::push(int input, Packet *p){
         click_ip* ip_header = (click_ip*) (q->data());
         MobilityBindingListEntry* entry = getEntry(ip_header->ip_dst);
         if (entry) { //to be encapsulated
-            //click_chatter("Home Agent: Packet to be tunneled detected");
+            click_chatter("Home Agent: Packet to be tunneled detected");
             output(1).push(p);
         }
         else
@@ -123,7 +123,7 @@ void MobilityBindingList::push(int input, Packet *p){
         MobilityBindingListEntry* entry = getEntry(ip_inner_header->ip_dst);
         ip_outer_header->ip_dst = entry->care_of_address;
         ip_outer_header->ip_src = ip_inner_header->ip_dst;
-        //click_chatter("Home Agent: Outer IP header of ip-in-ip packet set");
+        click_chatter("Home Agent: Outer IP header of ip-in-ip packet set");
         output(0).push(q);
 
     }

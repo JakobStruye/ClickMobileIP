@@ -8,7 +8,7 @@ elementclass ForeignAgent
 $private_address, $public_address, $default_gateway
 |
   vis :: VisitorList(IP $private_address);
-  advertise :: AgentAdvertisementSender(IP 192.168.3.254, HOME 0, FOREIGN 1);
+  advertise :: AgentAdvertisementSender(IP 192.168.3.254, HOME 0, FOREIGN 1, RLIFETIME 15);
   forreq :: ForeignRequestProcess();
 
   Script(write forreq.addOwnIP IP $private_address:ip)
@@ -57,6 +57,7 @@ $private_address, $public_address, $default_gateway
   findencap[0]
   -> Strip(20) //outer IP header
   -> CheckIPHeader
+  -> DecIPTTL
   //Placeholder dst
   -> EtherEncap(0x0800, $private_address:ether, 2:2:2:2:2:2)
   //set ethernet dst

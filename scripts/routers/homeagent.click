@@ -12,7 +12,7 @@ $private_address, $public_address, $default_gateway
   mob :: MobilityBindingList()
   reqtorep :: HomeRequestProcess;
   enc :: Encapsulator(SRC $private_address:ip);
-  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0);
+  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0, RLIFETIME 15);
 
 	// Shared IP input path and routing table
 	ip :: Strip(14)

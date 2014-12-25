@@ -28,7 +28,7 @@ int Encapsulator::configure(Vector<String> &conf, ErrorHandler *errh) {
  */
 void Encapsulator::push(int, Packet *p){
     //Check if TTL not 0 before getting here
-    //click_chatter("Home Agent: Encapsulating a packet");
+    click_chatter("Home Agent: Encapsulating a packet");
     WritablePacket* q = (WritablePacket*) p;
     click_ip* ip_outer_header = (click_ip*) (q->data());
     click_ip* ip_inner_header = (click_ip*) (ip_outer_header+1);

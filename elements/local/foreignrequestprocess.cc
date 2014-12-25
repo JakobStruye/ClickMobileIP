@@ -40,7 +40,7 @@ WritablePacket* ForeignRequestProcess::makeReply(RegistrationRequest* request, i
     int headroom =  sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
     int packetsize = sizeof(RegistrationReply);
     WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
-    if (packet == 0) //click_chatter("cannot make packet!");
+    if (packet == 0) click_chatter("cannot make packet!");
     memset(packet->data(), 0, packet->length());
 //    click_ether* eth_header = (click_ether*) req->data();
 //    for(int i = 0; i < 6; i++) {
@@ -67,7 +67,7 @@ WritablePacket* ForeignRequestProcess::makeReply(RegistrationRequest* request, i
     reply->home_address = request->home_address;
     reply->home_agent = request->home_agent;
     //uint32_t tempIdentification = request->identification[1];
-    //click_chatter("%i %i", ntohl(request->identification[0]), ntohl(request->identification[1]) );
+    click_chatter("%i %i", ntohl(request->identification[0]), ntohl(request->identification[1]) );
     reply->identification[0] = request->identification[0];
     reply->identification[1] = request->identification[1];
     return packet; //now a reply, with some gibberish at the end which should be truncated
@@ -89,25 +89,38 @@ void ForeignRequestProcess::push(int, Packet *p){
         output(0).push(p);
         return;
     }
+    //Check UDP checksum (code based on CheckUDPHeader code)
+    unsigned len = ntohs(udp_header->uh_ulen);
+    unsigned csum = click_in_cksum((unsigned char *) udp_header, len);
+    //Don't discard on csum == 0
+    if (csum && click_in_cksum_pseudohdr(csum, ip_header, len) != 0) {
+        click_chatter("Bad UDP checksum for registration request at foreign agent, discarded");
+        return;
+    }
+    //Check if reserved bit is 0
+    if (req->flags & (1 << 2)) {
+        click_chatter("Foreign host received request with reserved bit set");
+        Packet* reply = makeReply(req, 70);
+        output(1).push(reply);
+        return;
+    }
     for (Vector<String>::iterator it = _addrs.begin(); it != _addrs.end(); it++) {
-        //click_chatter((*it).c_str());
-        //click_chatter(IPAddress(req->home_agent).unparse().c_str());
-        //std::cout << req->home_address << std::endl;
         if (*it == IPAddress(req->home_agent).unparse()) {
             //home address is interface of this foreign agent
-            //click_chatter("DENIED");
+            click_chatter("Foreign host received request with its own IP address as home address");
             Packet* reply = makeReply(req, 136);
-            //click_chatter("CONVERTED");
             output(1).push(reply);
             return;
         }
     }
+
+
     ip_header->ip_src = ip_header->ip_dst;
     ip_header->ip_dst = req->home_agent;
     udp_header->uh_sport = htons(1234); //random?
     udp_header->uh_dport = htons(434);
-    //click_chatter("Foreign Agent: Registration Request detected");
-    //click_chatter("Foreign Agent: Registration Request modified");
+    click_chatter("Foreign Agent: Registration Request detected");
+    click_chatter("Foreign Agent: Registration Request modified");
     output(0).push(q);
 }
 

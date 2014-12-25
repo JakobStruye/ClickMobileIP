@@ -44,9 +44,17 @@ void ForeignReplyProcess::push(int, Packet *p){
         output(0).push(p);
         return;
     }
+    //Check UDP checksum (code based on CheckUDPHeader code)
+    unsigned len = ntohs(udp_header->uh_ulen);
+    unsigned csum = click_in_cksum((unsigned char *) udp_header, len);
+    //Don't discard on csum == 0
+    if (csum && click_in_cksum_pseudohdr(csum, ip_header, len) != 0) {
+        click_chatter("Bad UDP checksum for registration reply at foreign agent, discarded");
+        return;
+    }
     //ip_header->ip_src = ip_header->ip_dst;
     //ip_header->ip_dst = reply->home_address;
-    //click_chatter("Foreign Agent: Registration Reply detected");
+    click_chatter("Foreign Agent: Registration Reply detected");
     output(1).push(q);
 }
 

@@ -25,8 +25,8 @@ class AgentAdvertisementSender : public Element {
 
     Timer _timer;
     int _lifetime = 4;
-    int _registration_lifetime = 300;
-    uint16_t _seq_number = 0;
+    int _registration_lifetime;
+    uint16_t _seq_number;
     in_addr _address;
     bool _isHomeAgent;
     bool _isForeignAgent;

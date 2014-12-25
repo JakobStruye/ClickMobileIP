@@ -25,12 +25,12 @@ WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req) {
     int packetsize = sizeof(RegistrationReply);
     int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
     WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
-    if (packet == 0) //click_chatter("cannot make packet!");
+    if (packet == 0) click_chatter("cannot make packet!");
     memset(packet->data(), 0, packet->length());
     RegistrationReply* format = (RegistrationReply*) packet->data();
     format->type = 3; //fixed
     format->code = 1;
-    format->lifetime = htons(300);
+    format->lifetime = req->lifetime; //TODO implement home max lifetime
     format->home_address = req->home_address;
     format->home_agent = req->home_agent;
     format->identification[0] = req->identification[0];
@@ -53,14 +53,22 @@ void HomeRequestProcess::push(int input, Packet *p){
 
     //incoming request
     if (input == 0) {
-        //click_chatter("Home Agent: Registration Request detected");
+        click_chatter("Home Agent: Registration Request detected");
         click_ip* ip_header = (click_ip*) (p->data());
         click_udp* udp_header = (click_udp*) (ip_header+1);
+        //Check UDP checksum (code based on CheckUDPHeader code)
+        unsigned len = ntohs(udp_header->uh_ulen);
+        unsigned csum = click_in_cksum((unsigned char *) udp_header, len);
+        //Don't discard on csum == 0
+        if (csum && click_in_cksum_pseudohdr(csum, ip_header, len) != 0) {
+            click_chatter("Bad UDP checksum for registration request at home agent, discarded");
+            return;
+        }
         RegistrationRequest * req = (RegistrationRequest*) (udp_header+1);
         WritablePacket* q = makeReply(req);
         RegistrationReply* rep = (RegistrationReply*) (q->data());
         requests.push_back(p);
-        //click_chatter("Home Agent: Registration Reply created");
+        click_chatter("Home Agent: Registration Reply created");
         output(1).push(q);
     }
     //reply with UDPIP set
@@ -78,7 +86,7 @@ void HomeRequestProcess::push(int input, Packet *p){
         udp_header_reply->uh_sport = udp_header_request->uh_dport;
         udp_header_reply->uh_dport = udp_header_request->uh_sport;
         output(2).push(request); //to be discarded
-        //click_chatter("Home Agent: Registration Reply with correct IP and UDP headers sent");
+        click_chatter("Home Agent: Registration Reply with correct IP and UDP headers sent");
         output(0).push(q);
 
     }

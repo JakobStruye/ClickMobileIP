@@ -28,6 +28,8 @@ class ForeignRequestProcess : public Element {
 
         Vector<String> _addrs;
 
+        in_addr _care_of_address;
+
 };
 
 CLICK_ENDDECLS

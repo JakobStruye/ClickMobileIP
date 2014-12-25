@@ -34,9 +34,10 @@ class RegistrationRequestSender : public Element {
         void add_handlers();
 
         SavedAdvertisement* getEntry(in_addr);
+        void deleteAdvertisement(in_addr);
 
 
-		Packet* makePacket(in_addr care_of);
+		Packet* makePacket(in_addr, int);
         void run_timer(Timer *);
 		void push(int, Packet *);
 
@@ -49,10 +50,14 @@ class RegistrationRequestSender : public Element {
         Vector<SavedAdvertisement*> _savedAdvertisements;
 
 	    unsigned _remaining_lifetime;
+	    bool _hasReregistered;
 
 	    in_addr _home_agent;
 	    in_addr _home_address;
 	    in_addr _care_of_address;
+
+	    uint32_t _lowerIdentification;
+	    uint32_t _upperIdentification;
 
 
 };
