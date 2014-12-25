@@ -7,6 +7,7 @@
 #include <clicknet/udp.h>
 #include <clicknet/icmp.h>
 #include <clicknet/ether.h>
+#include <click/timer.hh>
 #include "registrationrequest.hh"
 #include "registrationreply.hh"
 #include "mobilitybindinglistentry.hh"
@@ -18,9 +19,12 @@ class MobilityBindingList : public Element {
         ~MobilityBindingList();
 
         const char *class_name() const  { return "MobilityBindingList"; }
-        const char *port_count() const  { return "3/4"; }
+        const char *port_count() const  { return "4/5"; }
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
+        int initialize(ErrorHandler*);
+
+        void run_timer(Timer*);
 
         MobilityBindingListEntry* getEntry(in_addr);
         void insertEntry(MobilityBindingListEntry*);
@@ -30,6 +34,8 @@ class MobilityBindingList : public Element {
         void push(int, Packet *);
     private:
         Vector<MobilityBindingListEntry*> mobilityList;
+
+        Timer _timer;
 
 
 

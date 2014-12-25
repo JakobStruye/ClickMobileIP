@@ -24,7 +24,7 @@ class AgentAdvertisementSender : public Element {
 		void push(int, Packet *);
 
     Timer _timer;
-    int _lifetime = 4;
+    int _lifetime;
     int _registration_lifetime;
     uint16_t _seq_number;
     in_addr _address;

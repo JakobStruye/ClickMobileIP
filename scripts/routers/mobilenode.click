@@ -34,7 +34,7 @@ $addr_info, $gateway
 	c0[2] -> Paint(1) -> ip;
 
   //Generate registration requests (for now on a timer)
-  request :: RegistrationRequestSender();
+  request :: RegistrationRequestSender(HOMEADDRESS 192.168.2.1, HOMEAGENT 192.168.2.254);
   request[0]
   //Set the destination address for Requests (later via Advertisements, now this way)
   -> Script (TYPE PACKET, set dstaddr $(request.gateway), write udpipenc.dst $dstaddr)  

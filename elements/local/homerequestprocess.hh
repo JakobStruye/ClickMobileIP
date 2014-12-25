@@ -21,11 +21,17 @@ class HomeRequestProcess : public Element {
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
 
-        WritablePacket* makeReply(RegistrationRequest*);
+        bool contains(String);
+
+        static int addHomeAgent(const String&, Element*, void*, ErrorHandler*);
+        void add_handlers();
+
+        WritablePacket* makeReply(RegistrationRequest*, int);
         void push(int, Packet *);
 
     private:
         DEQueue<Packet*> requests;
+        Vector<String> _home_agents;
 
 };
 

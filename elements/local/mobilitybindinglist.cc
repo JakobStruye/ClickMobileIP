@@ -6,7 +6,7 @@
 #include <cmath>
 
 CLICK_DECLS
-MobilityBindingList::MobilityBindingList(){
+MobilityBindingList::MobilityBindingList() : _timer(this){
     mobilityList = Vector<MobilityBindingListEntry*>();
 
 }
@@ -18,6 +18,28 @@ int MobilityBindingList::configure(Vector<String> &conf, ErrorHandler *errh) {
     if (cp_va_kparse(conf, this, errh, cpEnd) < 0) return -1;
     return 0;
 }
+
+int MobilityBindingList::initialize(ErrorHandler *errh) {
+    _timer.initialize(this);
+    _timer.schedule_after_msec(50);
+    return 0;
+}
+
+void MobilityBindingList::run_timer(Timer *) {
+    Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin();
+    while(it != mobilityList.end()) {
+        (*it)->remaining_lifetime--;
+        if (!(*it)->remaining_lifetime) {
+            it = mobilityList.erase(it);
+        }
+        else {
+            it++;
+        }
+    }
+    _timer.reschedule_after_msec(1000);
+}
+
+
 
 MobilityBindingListEntry* MobilityBindingList::getEntry(in_addr home_address) {
     for(Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++)
@@ -63,11 +85,13 @@ void MobilityBindingList::printList() {
  * Input 0: Expects Registration Request (valid), creates Mobility Binding
  * Input 1: Expects packet to be tunneled with outer header present
  * Input 2: Expects any packet but Registration, checks if should be tunneled
+ * Input 3: Expects Registration Reply, will remove binding if reply indicates request denied
  *
  * Output 0: Packet from Input 1 with IP addresses set
  * Output 1: Unchanged packets from Input 2, to be tunneled
  * Output 2: Unchanged packets from Input 0
  * Output 3: Unchanged packets from Input 2, not to be tunneled
+ * Output 4: Unchanged packets from Input 3
  */
 
 void MobilityBindingList::push(int input, Packet *p){
@@ -126,6 +150,15 @@ void MobilityBindingList::push(int input, Packet *p){
         click_chatter("Home Agent: Outer IP header of ip-in-ip packet set");
         output(0).push(q);
 
+    }
+    else if (input == 3) {
+        RegistrationReply* rep = (RegistrationReply*) (q->data());
+        if (rep->code != 1) {
+            MobilityBindingListEntry* entry = getEntry(rep->home_address);
+            deleteEntry(entry);
+            click_chatter("Home Agent: new mobility binding removed, request not accepted");
+        }
+        output(4).push(q);
     }
 }
 

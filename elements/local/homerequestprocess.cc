@@ -18,10 +18,27 @@ int HomeRequestProcess::configure(Vector<String> &conf, ErrorHandler *errh) {
     return 0;
 }
 
+int HomeRequestProcess::addHomeAgent(const String& conf, Element* e, void* thunk, ErrorHandler* errh) {
+    HomeRequestProcess* me = (HomeRequestProcess*) e;
+    IPAddress new_addr;
+    if (cp_va_kparse(conf, me, errh, "IP", cpkM, cpIPAddress, &new_addr,cpEnd) < 0) return -1;
+    me->_home_agents.push_back(new_addr.unparse());
+    return 0;
+}
 
+void HomeRequestProcess::add_handlers() {
+    add_write_handler("addHomeAgent", &addHomeAgent, (void*) 0);
+}
 
+bool HomeRequestProcess::contains(String IP) {
+    for (Vector<String>::iterator it = _home_agents.begin(); it != _home_agents.end(); it++) {
+        if ((*it) == IP)
+            return true;
+    }
+    return false;
+}
 
-WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req) {
+WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req, int errcode) {
     int packetsize = sizeof(RegistrationReply);
     int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
     WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
@@ -29,7 +46,7 @@ WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req) {
     memset(packet->data(), 0, packet->length());
     RegistrationReply* format = (RegistrationReply*) packet->data();
     format->type = 3; //fixed
-    format->code = 1;
+    format->code = errcode;
     format->lifetime = req->lifetime; //TODO implement home max lifetime
     format->home_address = req->home_address;
     format->home_agent = req->home_agent;
@@ -65,7 +82,15 @@ void HomeRequestProcess::push(int input, Packet *p){
             return;
         }
         RegistrationRequest * req = (RegistrationRequest*) (udp_header+1);
-        WritablePacket* q = makeReply(req);
+        int errcode = 1;
+        if (!contains(IPAddress(req->home_agent).unparse())) {
+            errcode = 136;
+        }
+        //Check if reserved bit is 0
+        if (req->flags & (1 << 2)) {
+            errcode = 134;
+        }
+        WritablePacket* q = makeReply(req, errcode);
         RegistrationReply* rep = (RegistrationReply*) (q->data());
         requests.push_back(p);
         click_chatter("Home Agent: Registration Reply created");

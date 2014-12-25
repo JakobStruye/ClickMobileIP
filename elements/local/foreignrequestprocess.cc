@@ -99,15 +99,23 @@ void ForeignRequestProcess::push(int, Packet *p){
     }
     //Check if reserved bit is 0
     if (req->flags & (1 << 2)) {
-        click_chatter("Foreign host received request with reserved bit set");
+        click_chatter("Foreign agent received request with reserved bit set");
         Packet* reply = makeReply(req, 70);
+        output(1).push(reply);
+        return;
+    }
+
+    //Check if nonstandard encapsulation requested
+    if ((req->flags & (1 << 3)) || (req->flags & (1 << 4)) || (req->flags & (1 << 5))) {
+        click_chatter("Foreign agent received request with nonstandard encapsulation requested");
+        Packet* reply = makeReply(req, 72);
         output(1).push(reply);
         return;
     }
     for (Vector<String>::iterator it = _addrs.begin(); it != _addrs.end(); it++) {
         if (*it == IPAddress(req->home_agent).unparse()) {
             //home address is interface of this foreign agent
-            click_chatter("Foreign host received request with its own IP address as home address");
+            click_chatter("Foreign agent received request with its own IP address as home address");
             Packet* reply = makeReply(req, 136);
             output(1).push(reply);
             return;

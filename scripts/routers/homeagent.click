@@ -12,7 +12,9 @@ $private_address, $public_address, $default_gateway
   mob :: MobilityBindingList()
   reqtorep :: HomeRequestProcess;
   enc :: Encapsulator(SRC $private_address:ip);
-  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0, RLIFETIME 15);
+  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0, RLIFETIME 15, LIFETIME 4);
+  
+  Script(write reqtorep.addHomeAgent IP 192.168.2.254);
 
 	// Shared IP input path and routing table
 	ip :: Strip(14)
@@ -49,6 +51,7 @@ $private_address, $public_address, $default_gateway
 	rt[0] -> [0]mob[2] 
   //Create reply
   -> [0]reqtorep[1]
+  -> [3]mob[4]
   -> UDPIPEncap(1.1.1.1, 1, 2.2.2.2, 2) //All values placeholder
   //Set IP addresses and UDP ports
   -> [1]reqtorep[0]

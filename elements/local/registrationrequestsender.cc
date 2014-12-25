@@ -10,8 +10,6 @@ RegistrationRequestSender::RegistrationRequestSender() :
     _pendingRegistrations = Vector<PendingRegistration*>();
     _remaining_lifetime = 0;
 
-    _home_address = IPAddress("192.168.2.1").in_addr();
-    _home_agent = IPAddress("192.168.2.254").in_addr();
     _care_of_address = IPAddress("0.0.0.0").in_addr(); //placeholder
     //Both parts of identification start off as uint32_t representation of home address
     //lower always decrements, upper increments
@@ -26,8 +24,13 @@ RegistrationRequestSender::~RegistrationRequestSender() {
 
 int RegistrationRequestSender::configure(Vector<String> &conf,
         ErrorHandler *errh) {
-    if (cp_va_kparse(conf, this, errh, cpEnd) < 0)
+    IPAddress homeaddr;
+    IPAddress homeagent;
+    if (cp_va_kparse(conf, this, errh, "HOMEADDRESS", cpkM, cpIPAddress, &homeaddr,
+            "HOMEAGENT", cpkM, cpIPAddress, &homeagent, cpEnd) < 0)
         return -1;
+    _home_agent = homeagent.in_addr();
+    _home_address = homeaddr.in_addr();
     return 0;
 }
 

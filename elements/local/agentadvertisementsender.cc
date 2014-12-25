@@ -16,7 +16,8 @@ AgentAdvertisementSender::~AgentAdvertisementSender() {
 int AgentAdvertisementSender::configure(Vector<String> &conf,
         ErrorHandler *errh) {
     if (cp_va_kparse(conf, this, errh, "IP", cpkM, cpIPAddress, &_address, "HOME", cpkM, cpBool, &_isHomeAgent,
-            "FOREIGN", cpkM, cpBool, &_isForeignAgent, "RLIFETIME", cpkM, cpInteger, &_registration_lifetime, cpEnd) < 0)
+            "FOREIGN", cpkM, cpBool, &_isForeignAgent, "RLIFETIME", cpkM, cpInteger, &_registration_lifetime,
+            "LIFETIME", cpkM, cpInteger, &_lifetime, cpEnd) < 0)
         return -1;
     return 0;
 }
