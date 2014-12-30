@@ -1,6 +1,9 @@
 #ifndef ICMPAGENTADVERTISEMENT_HH_
 #define ICMPAGENTADVERTISEMENT_HH_
 
+/**
+ * This includes both the regular router advertisement and the mobility agent advertisement extension
+ */
 struct ICMPAgentAdvertisement {
 	uint8_t num_addrs;
 	uint8_t addr_entry_size;

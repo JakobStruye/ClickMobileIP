@@ -13,6 +13,12 @@
 #include "mobilitybindinglistentry.hh"
 CLICK_DECLS
 
+/**
+ * Mobility binding list for home agent: generates binding for incoming requests,
+ * checks if bindings stay valid for incoming replies,
+ * checks if incoming packets should be encapsulated,
+ * sets IP addresses for encapsulated packets
+ */
 class MobilityBindingList : public Element {
     public:
         MobilityBindingList();

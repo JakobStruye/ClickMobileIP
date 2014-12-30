@@ -7,6 +7,9 @@
 #include "registrationreply.hh"
 CLICK_DECLS
 
+/**
+ * Filters registration replies from other packets at foreign agent
+ */
 class ForeignReplyProcess : public Element {
     public:
         ForeignReplyProcess();

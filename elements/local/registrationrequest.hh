@@ -1,7 +1,10 @@
 #ifndef REGISTRATIONREQUEST_HH
 #define REGISTRATIONREQUEST_HH
 
-struct  __attribute__((__packed__)) RegistrationRequest {
+/**
+ * Struct for registration requests
+ */
+struct RegistrationRequest {
 	uint8_t type;
 	uint8_t flags;
 	uint16_t lifetime;

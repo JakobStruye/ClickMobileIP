@@ -2,8 +2,7 @@
 #include <click/confparse.hh>
 #include <click/error.hh>
 #include "mobilitybindinglist.hh"
-#include <iostream>
-#include <cmath>
+
 
 CLICK_DECLS
 MobilityBindingList::MobilityBindingList() : _timer(this){
@@ -25,6 +24,9 @@ int MobilityBindingList::initialize(ErrorHandler *errh) {
     return 0;
 }
 
+/**
+ * Reduce remaining lifetime of all mobility bindings every second, erase if 0
+ */
 void MobilityBindingList::run_timer(Timer *) {
     Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin();
     while(it != mobilityList.end()) {
@@ -40,8 +42,9 @@ void MobilityBindingList::run_timer(Timer *) {
     _timer.reschedule_after_msec(1000);
 }
 
-
-
+/**
+ * Check if given IP address has binding, return binding if found
+ */
 MobilityBindingListEntry* MobilityBindingList::getEntry(in_addr home_address) {
     for(Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++)
         if ((*it)->home_address == home_address)
@@ -50,10 +53,16 @@ MobilityBindingListEntry* MobilityBindingList::getEntry(in_addr home_address) {
     return NULL;
 }
 
+/**
+ * Add a new binding
+ */
 void MobilityBindingList::insertEntry(MobilityBindingListEntry* entry) {
     mobilityList.push_back(entry);
 }
 
+/**
+ * Remove given existing binding
+ */
 void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
     Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin();
     while (it != mobilityList.end()) {
@@ -67,6 +76,9 @@ void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
     }
 }
 
+/**
+ * Allows list to be printed (for debugging purposes)
+ */
 void MobilityBindingList::printList() {
     click_chatter("Mobility Binding List: \n");
     for (Vector<MobilityBindingListEntry*>::iterator it = mobilityList.begin(); it != mobilityList.end(); it++) {
@@ -84,21 +96,21 @@ void MobilityBindingList::printList() {
  * Expects IP packets
  *
  * Input 0: Expects Registration Request (valid), creates Mobility Binding
- * Input 1: Expects packet to be tunneled with outer header present
+ * Input 1: Expects Registration Reply, will remove binding if reply indicates request denied
  * Input 2: Expects any packet but Registration, checks if should be tunneled
- * Input 3: Expects Registration Reply, will remove binding if reply indicates request denied
+ * Input 3: Expects packet to be tunneled with outer header present
  *
- * Output 0: Packet from Input 1 with IP addresses set
- * Output 1: Unchanged packets from Input 2, to be tunneled
- * Output 2: Unchanged packets from Input 0
+ * Output 0: Unchanged packets from Input 0
+ * Output 1: Unchanged packets from Input 1
+ * Output 2: Unchanged packets from Input 2, to be tunneled
  * Output 3: Unchanged packets from Input 2, not to be tunneled
- * Output 4: Unchanged packets from Input 3
+ * Output 4: Packet from Input 3 with IP addresses set
  */
 
 void MobilityBindingList::push(int input, Packet *p){
     WritablePacket* q = (WritablePacket*) p;
 
-    if (input == 0) {
+    if (input == 0) { //Should be request
         click_ip* ip_header = (click_ip*) (q->data());
         if (ip_header->ip_p == 17) { //UDP
             click_udp* udp_header = (click_udp*) (ip_header+1);
@@ -123,44 +135,44 @@ void MobilityBindingList::push(int input, Packet *p){
                     newEntry->remaining_lifetime = ntohs(req->lifetime);
                     insertEntry(newEntry);
                 }
-                //printList();
                 click_chatter("Home Agent: Mobility Binding created");
                 //Propagate unchanged packet
-                output(2).push(p);
+                output(0).push(p);
                 return;
             }
         }
     }
-    else if (input == 2) {
-        //Not a registration
-        click_ip* ip_header = (click_ip*) (q->data());
-        MobilityBindingListEntry* entry = getEntry(ip_header->ip_dst);
-        if (entry) { //to be encapsulated
-            click_chatter("Home Agent: Packet to be tunneled detected");
-            output(1).push(p);
-        }
-        else
-            output(3).push(p);
-    }
-    else if (input == 1) {
-        click_ip* ip_outer_header = (click_ip*) q->data();
-        click_ip* ip_inner_header = (click_ip*) (ip_outer_header+1);
-        MobilityBindingListEntry* entry = getEntry(ip_inner_header->ip_dst);
-        ip_outer_header->ip_dst = entry->care_of_address;
-        ip_outer_header->ip_src = ip_inner_header->ip_dst;
-        click_chatter("Home Agent: Outer IP header of ip-in-ip packet set");
-        output(0).push(q);
-
-    }
-    else if (input == 3) {
+    else if (input == 1) { //Should be reply
         RegistrationReply* rep = (RegistrationReply*) (q->data());
-        if (rep->code != 1) {
+        if (rep->code != 1) { //If reply indicates denied, remove that binding
             MobilityBindingListEntry* entry = getEntry(rep->home_address);
             deleteEntry(entry);
             click_chatter("Home Agent: new mobility binding removed, request not accepted");
         }
-        output(4).push(q);
+        output(1).push(q);
     }
+    else if (input == 2) { //Expects anything but registration
+        click_ip* ip_header = (click_ip*) (q->data());
+        MobilityBindingListEntry* entry = getEntry(ip_header->ip_dst);
+        if (entry) { //if binding present for this dst address, needs encapsulation
+            click_chatter("Home Agent: Packet to be tunneled detected");
+            output(2).push(p);
+        }
+        else
+            output(3).push(p);
+    }
+    else if (input == 3) { //Expects encapsulated packet
+        click_ip* ip_outer_header = (click_ip*) q->data();
+        click_ip* ip_inner_header = (click_ip*) (ip_outer_header+1);
+        //Grab binding, should exist
+        MobilityBindingListEntry* entry = getEntry(ip_inner_header->ip_dst);
+        ip_outer_header->ip_dst = entry->care_of_address; //Set IP addresses
+        ip_outer_header->ip_src = ip_inner_header->ip_dst;
+        click_chatter("Home Agent: Outer IP header of ip-in-ip packet set");
+        output(4).push(q);
+
+    }
+
 }
 
 

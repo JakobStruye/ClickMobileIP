@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <click/config.h>
 #include <click/confparse.hh>
 #include <click/error.hh>
@@ -19,7 +17,10 @@ int ForeignRequestProcess::configure(Vector<String> &conf, ErrorHandler *errh) {
     return 0;
 }
 
-
+/**
+ * Handler: give this element IP addresses of the foreign agent
+ * so that it can determine if home agent address in request is its own address (is an error!)
+ */
 int ForeignRequestProcess::addOwnIP(const String& conf, Element* e, void* thunk, ErrorHandler* errh) {
     ForeignRequestProcess* me = (ForeignRequestProcess*) e;
     IPAddress new_addr;
@@ -32,45 +33,27 @@ void ForeignRequestProcess::add_handlers() {
     add_write_handler("addOwnIP", &addOwnIP, (void*) 0);
 }
 
-
+/**
+ * Generate a registration reply if foreign agent denies request
+ */
 WritablePacket* ForeignRequestProcess::makeReply(RegistrationRequest* request, int errcode) {
-    //Converts the request into a reply
-    //int headroom = sizeof(click_ether);
-    //int packetsize = sizeof(click_udp) + sizeof(click_ip) + sizeof(RegistrationReply);
+
     int headroom =  sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
     int packetsize = sizeof(RegistrationReply);
     WritablePacket* packet = Packet::make(headroom,0,packetsize,0);
     if (packet == 0) click_chatter("cannot make packet!");
     memset(packet->data(), 0, packet->length());
-//    click_ether* eth_header = (click_ether*) req->data();
-//    for(int i = 0; i < 6; i++) {
-//        uint8_t temp = eth_header->ether_dhost[i];
-//        eth_header->ether_dhost[i] = eth_header->ether_shost[i];
-//        eth_header->ether_shost[i] = temp;
-//    }
-//    click_ip* ip_header_req = (click_ip*) req->data();
-//    click_ip* ip_header_rep = (click_ip*) packet->data();
-//    ip_header_rep->ip_p = ip_header_req->ip_p;
-//    ip_header_rep->ip_v = ip_header_req->ip_v;
-//    ip_header_rep->ip_hl = ip_header_req->ip_hl;
-//    ip_header_rep->ip_src = ip_header_req->ip_dst;
-//    ip_header_rep->ip_dst = ip_header_req->ip_src;
-//    click_udp* udp_header_req = (click_udp*) (ip_header_req+1);
-//    click_udp* udp_header_rep = (click_udp*) (ip_header_rep+1);
-//    udp_header_rep->uh_dport = udp_header_req->uh_sport;
-//    udp_header_rep->uh_sport = udp_header_req->uh_dport;
+
     RegistrationReply* reply = (RegistrationReply*) (packet->data());
 
     reply->type = 3; //fixed
-    reply->code = errcode;
-    reply->lifetime = request->lifetime;
+    reply->code = errcode; //Determined in other function
+    reply->lifetime = request->lifetime; //Copy these fields from request
     reply->home_address = request->home_address;
     reply->home_agent = request->home_agent;
-    //uint32_t tempIdentification = request->identification[1];
-    click_chatter("%i %i", ntohl(request->identification[0]), ntohl(request->identification[1]) );
     reply->identification[0] = request->identification[0];
     reply->identification[1] = request->identification[1];
-    return packet; //now a reply, with some gibberish at the end which should be truncated
+    return packet;
 }
 /**
  * Expects Registration Requests in IP
@@ -78,14 +61,15 @@ WritablePacket* ForeignRequestProcess::makeReply(RegistrationRequest* request, i
  * Input 0: Registration Request
  *
  * Output 0: Request from Input 0, now with IP addresses and UDP ports changed to reach home agent
+ * Output 1: Reply in case Request was denied
  */
 void ForeignRequestProcess::push(int, Packet *p){
-    //TODO verify if Registration Request
+
     WritablePacket* q = (WritablePacket*) p;
     click_ip* ip_header = (click_ip*) (q->data());
     click_udp* udp_header = (click_udp*) (ip_header+1);
     RegistrationRequest * req = (RegistrationRequest*) (udp_header+1);
-    if (req->type != 1) {
+    if (req->type != 1) { //Not what we expected, just push along
         output(0).push(p);
         return;
     }
@@ -105,7 +89,7 @@ void ForeignRequestProcess::push(int, Packet *p){
         return;
     }
 
-    //Check if nonstandard encapsulation requested
+    //Check if nonstandard encapsulation requested (not offered here)
     if ((req->flags & (1 << 3)) || (req->flags & (1 << 4)) || (req->flags & (1 << 5))) {
         click_chatter("Foreign agent received request with nonstandard encapsulation requested");
         Packet* reply = makeReply(req, 72);
@@ -122,7 +106,7 @@ void ForeignRequestProcess::push(int, Packet *p){
         }
     }
 
-
+    //Set IP addresses and UDP ports accordingly
     ip_header->ip_src = ip_header->ip_dst;
     ip_header->ip_dst = req->home_agent;
     udp_header->uh_sport = htons(1234); //random?

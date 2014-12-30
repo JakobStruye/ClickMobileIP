@@ -1,6 +1,9 @@
 #ifndef REGISTRATIONREPLY_HH_
 #define REGISTRATIONREPLY_HH_
 
+/**
+ * Struct for registration replies
+ */
 struct RegistrationReply {
     uint8_t type;
     uint8_t code;

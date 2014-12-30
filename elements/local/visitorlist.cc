@@ -2,8 +2,6 @@
 #include <click/confparse.hh>
 #include <click/error.hh>
 #include "visitorlist.hh"
-#include <iostream>
-#include <cmath>
 
 CLICK_DECLS
 VisitorList::VisitorList() : _timer(this){
@@ -25,6 +23,9 @@ int VisitorList::initialize(ErrorHandler *errh) {
     return 0;
 }
 
+/**
+ * Decrement remaining lifetime of entries in visitor list every second, erase if 0
+ */
 void VisitorList::run_timer(Timer*) {
     Vector<VisitorListEntry*>::iterator it = visList.begin();
     while (it != visList.end()) {
@@ -40,6 +41,9 @@ void VisitorList::run_timer(Timer*) {
     _timer.reschedule_after_msec(1000);
 }
 
+/**
+ * Look for visitor list entry based on lower 32bits of identification, return it if found
+ */
 VisitorListEntry* VisitorList::getEntry(uint32_t identification) {
     for(Vector<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++)
         if ((*it)->identification[1] == identification)
@@ -48,6 +52,9 @@ VisitorListEntry* VisitorList::getEntry(uint32_t identification) {
     return NULL;
 }
 
+/**
+ * Look for visitor list entry based on source IP address, return it if found
+ */
 VisitorListEntry* VisitorList::getEntry(in_addr ip_src) {
     for(Vector<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++)
         if ((*it)->ip_src == ip_src)
@@ -56,16 +63,21 @@ VisitorListEntry* VisitorList::getEntry(in_addr ip_src) {
     return NULL;
 }
 
+/**
+ * Insert entry into visitor list
+ */
 void VisitorList::insertEntry(VisitorListEntry* entry) {
     visList.push_back(entry);
 }
 
+/**
+ * Delete given entry from visitor list
+ */
 void VisitorList::deleteEntry(VisitorListEntry* entry) {
     Vector<VisitorListEntry*>::iterator it = visList.begin();
     while (it != visList.end()) {
         if (*it == entry) {
             visList.erase(it);
-            //TODO verify if unallocating here is safe
             delete entry;
             break;
         }
@@ -73,6 +85,9 @@ void VisitorList::deleteEntry(VisitorListEntry* entry) {
     }
 }
 
+/**
+ * Allows list to be printed (for debugging purposes)
+ */
 void VisitorList::printList() {
     click_chatter("Visitor List: \n");
     for (Vector<VisitorListEntry*>::iterator it = visList.begin(); it != visList.end(); it++) {
@@ -110,31 +125,32 @@ void VisitorList::push(int input, Packet *p){
     if (input == 2) {
         click_chatter("Foreign Agent: Detunneled packet received");
         VisitorListEntry* entry = getEntry(ip_header->ip_dst);
-        //Error if !entry
-        /*if (!entry)
-            ...*/
-        for(int i = 0; i < 6; i++)
+
+        for(int i = 0; i < 6; i++) //Set dst ethnet address and deliver on local datalink
             eth_header->ether_dhost[i] = entry->mobile_MAC[i];
         click_chatter("Foreign Agent: dst MAC of detunneled packet set");
         output(2).push(q);
         return;
     }
     if ((ip_header->ip_dst != ipAddr && ip_header->ip_src != ipAddr)|| ip_header->ip_p != 17) {
-        output(0).push(p); //not a registration request, pass along
+        output(0).push(p); //not a registration request/reply, pass along
         return;
     }
     click_udp* udp_header = (click_udp*) (ip_header+1);
 
 
     if (ntohs(udp_header->uh_dport) != 434 && ntohs(udp_header->uh_sport) != 434) {
-        output(0).push(p); //not a registration message, pass along
+        output(0).push(p); //not a registration request/reply, pass along
         return;
     }
     RegistrationRequest* req = (RegistrationRequest*) (udp_header+1);
     if (input == 0 && req->type == 1) {
+        //Must be registration request
         VisitorListEntry* oldEntry = getEntry(ip_header->ip_src);
-        if (oldEntry)
+        if (oldEntry) //Delete older entry for this node if it existed
             deleteEntry(oldEntry);
+
+        //Generate new visitor list entry
         VisitorListEntry* entry = new VisitorListEntry;
         for(int i = 0; i < 6; i++)
             entry->mobile_MAC[i] = eth_header->ether_shost[i];
@@ -148,19 +164,20 @@ void VisitorList::push(int input, Packet *p){
         entry->remaining_lifetime = ntohs(req->lifetime);
 
         insertEntry(entry);
-        //printList();
         click_chatter("Foreign Agent: Visitor List entry created for Registration Request");
         output(0).push(q);
     }
     else if (input == 1){
+        //Must be a reply
         RegistrationReply* reply = (RegistrationReply*) (udp_header+1);
         VisitorListEntry* entry = getEntry(ntohl(reply->identification[1]));
         //Reply not recognized, silently discard
         if (!entry)
             return;
+        //Set saved lifetime to minimum of that lifetime and lifetime in reply
         if (entry->lifetime > ntohs(reply->lifetime))
           entry->lifetime = ntohs(reply->lifetime);
-        //Set remaining lifetime
+        //Set headers for delivery on local datalink
         for(int i = 0; i < 6; i++)
             eth_header->ether_dhost[i] = entry->mobile_MAC[i];
         ip_header->ip_src = entry->ip_dst;
@@ -177,11 +194,7 @@ void VisitorList::push(int input, Packet *p){
         output(1).push(q);
 
     }
-
-
 }
-
-
 
 
 CLICK_ENDDECLS

@@ -10,9 +10,9 @@ $private_address, $public_address, $default_gateway
 |
 
   mob :: MobilityBindingList()
-  reqtorep :: HomeRequestProcess;
+  reqtorep :: HomeRequestProcess(LIFETIME 300);
   enc :: Encapsulator(SRC $private_address:ip);
-  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0, RLIFETIME 15, LIFETIME 4);
+  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0, RLIFETIME 15, LIFETIME 4, INTERVAL 3000);
   
   Script(write reqtorep.addHomeAgent IP 192.168.2.254);
 
@@ -48,28 +48,25 @@ $private_address, $public_address, $default_gateway
 	
 	// Local delivery
   //Add MobilityBinding (assume correct request)
-	rt[0] -> [0]mob[2] 
+	rt[0] -> [0]mob[0] 
   //Create reply
-  -> [0]reqtorep[1]
-  -> [3]mob[4]
+  -> [0]reqtorep[0]
+  -> [1]mob[1]
   -> UDPIPEncap(1.1.1.1, 1, 2.2.2.2, 2) //All values placeholder
   //Set IP addresses and UDP ports
-  -> [1]reqtorep[0]
+  -> [1]reqtorep[1]
   -> GetIPAddress(IP dst)
   -> SetUDPChecksum
   -> SetIPChecksum
   -> rt;
-  
-  //Send Request on output 2, to be discarded
-  reqtorep[2] -> [2]output;
 
   //Packet to be tunneled
-  mob[1]
+  mob[2]
   -> IPEncap(ipip, 3.3.3.3, 4.4.4.4) //All values placeholder
   //Check against routing loops and set tos, continue here if no loop danger
   -> enc[0]
   //Set outer IP addresses
-  -> [1]mob[0] 
+  -> [3]mob[4] 
   -> GetIPAddress(IP dst) -> SetIPChecksum -> rt;
 
   //Tunneling this would cause loops, send to output 2 to be discarded

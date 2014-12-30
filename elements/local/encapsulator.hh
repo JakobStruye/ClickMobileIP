@@ -7,6 +7,9 @@
 #include <clicknet/ether.h>
 CLICK_DECLS
 
+/**
+ * Encapsulates all incoming packets (IP in IP)
+ */
 class Encapsulator : public Element {
     public:
         Encapsulator();
@@ -20,7 +23,7 @@ class Encapsulator : public Element {
         void push(int, Packet *);
 
     private:
-        in_addr ip_src;
+        in_addr ip_src; //Outer source IP
 
 
 

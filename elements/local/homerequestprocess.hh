@@ -11,13 +11,17 @@
 
 CLICK_DECLS
 
+/**
+ * Expects Requests: will generate Replies
+ * Expects its own Replies back: will set IP and UDP fields
+ */
 class HomeRequestProcess : public Element {
     public:
         HomeRequestProcess();
         ~HomeRequestProcess();
 
         const char *class_name() const  { return "HomeRequestProcess"; }
-        const char *port_count() const  { return "2/3"; }
+        const char *port_count() const  { return "2/2"; }
         const char *processing() const  { return PUSH; }
         int configure(Vector<String>&, ErrorHandler*);
 
@@ -32,6 +36,8 @@ class HomeRequestProcess : public Element {
     private:
         DEQueue<Packet*> requests;
         Vector<String> _home_agents;
+
+        int _lifetime;
 
 };
 

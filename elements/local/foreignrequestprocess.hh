@@ -10,6 +10,9 @@
 
 CLICK_DECLS
 
+/**
+ * Expects Registration Requests, will verify it and pass it along or deny it and respond with Reply
+ */
 class ForeignRequestProcess : public Element {
     public:
         ForeignRequestProcess();

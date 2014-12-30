@@ -2,7 +2,9 @@
 #define PENDINGREGISTRATION_HH_
 
 
-
+/**
+ * struct for pending registrations at mobile node
+ */
 struct PendingRegistration {
     uint8_t mobile_MAC[6];
     struct in_addr dst;
