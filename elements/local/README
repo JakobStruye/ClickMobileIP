@@ -5,38 +5,62 @@ Daniel Frenkel    Jakob Struye
 20120710          20120612
 -------------------------------
 
-Tussentijdse evaluatie
+Eindevaluatie
 ----------------------
 
-1) Geïmplementeerde features
+1) Werking en volgorde van de elementen
+=======================================
+
+  A) Agent advertisements:
+  -----------------------
+
+    -De AgentAdvertisementSender in de home en foreign agent genereert en stuurt automatisch Agent Advertisements
+    -Deze worden ontvangen door de RegistrationRequestSender in de mobile node
+    -Indien de mobile node geen actieve registratie had, zal de RegistrationRequestSender een Registration Request genereren
+    -De relevante informatie van de advertisement wordt sowieso bijgehouden, voor verder gebruik.
+
+  B) Registration Requests en Replies
+  ------------------------
+
+    -De RegistrationRequestSender stuurt Registration Requests en bewaart relevante informatie van de Pending Request
+    -In de foreign agent passeert de Request (nog in ethernetheader) eerst door de VisitorList, waar een entry wordt aangemaakt die relevante info van de Request opslaat
+    -Daarna ontvangt de ForeignRequestProcess de Request (in IP-header). Deze valideert de Request. Bij een geaccepteerde Request worden de IP- en UDP-headers aangepast en wordt het pakket doorgestuurd, bij een geweigerde Request wordt een Reply gegenereerd en terug naar de mobile node gestuurd.
+    -In de home agent passeert de Request (in IP-header) eerst door de MobilityBindingList, waar een entry wordt aangemaakt die relevante info van de gevraagde binding opslaat.
+    -Daarna ontvangt de HomeRequestProcess de Request. Deze valideert de Request en genereert een Reply met code afhankelijk van de uitkomst van de validatie.
+    -De MobilityBindingList ontvangt de nieuwe Reply en verwijdert de binding als de Reply aangeeft dat de Request geweigerd is.
+    -HomeRequestProcess ontvangt terug de nieuwe Reply, nu in UDP- en IP-headers en past deze aan (aan de hand van opgeslagen data van de Request) en stuurt deze door
+    -In de foreign agent ontvangt eerst de ForeignreplyProcess de Reply, dat Replies van andere pakketten scheidt en Replies valideert.
+    -Daarna ontvangt terug de VisitorList de Reply. De visitor list entry wordt aangepast, UDP-, IP- en ethernetheaders van de Reply worden aangepast en het pakket wordt doorgestuurd.
+    -In de mobile node ontvangt de RegistrationRequestSender de Reply en wordt de registration opgeslagen als de Request geaccepteerd is.
+
+    -Wanneer een Registration bijna timed out is, stuurt de mobile node een nieuwe Registration Request
+    -Wanneer een Registration timed out is en de mobile node nog van een andere agent Advertisements ontvangt, wordt daarnaar een Registration Request gestuurd.
+    -Wanneer de mobile node geen Advertisements meer ontvangt van de agent waarop hij geregistreerd is, wordt de registratie verwijderd (en wordt eventueel met een andere agent geregistreerd)
+    -Wanneer een reset van een agent waarbij de node geregistreerd is, wordt gedetecteerd adhv sequence numbers, wordt opnieuw geregistreerd.
+
+
+    -MERK OP: move detection gebeurt aan de hand van het algoritme in de RFC: movement wordt pas gedetecteerd wanneer de lifetime van de laatst ontvangen Advertisement verstreken is. Dit betekent dat voor een vlotte detectie deze lifetimes kort moeten worden ingesteld. Dit betekent ook dat na het verplaatsen van de mobile node, hij even onbereikbaar wordt; het is dus te verwachten dat enkele pings niet beantwoord worden in het testscript.
+
+  C) Tunneling
+  ------------
+
+    -Alle pakketten voor het lokale netwerk in de home agent worden door de MobilityBindingList gestuurd. Deze scheidt te tunnelen pakketten (==met mobility binding voor destination IP) van niet te tunnelen pakketten.
+    -Het standaardelement IPEncap van Click plaatst te tunnelen pakketten in een tweede IP-header. Deze worden door een Encapsulator gestuurd: deze scheidt enkel correct geëncapsuleerde pakketten van loopende pakketten.
+    -De getunnelde pakketten worden nog eens door de MobilityBindingList gestuurd, om de IP-header correct in te vullen.
+    -In de foreign agent worden standaardelementen IPClassifier en Strip gebruikt om getunnelde pakketten te herkennen en detunnelen.
+    -Verder worden ze nog door de VisitorList gestuurd om het MAC destination address correct in te vullen
+    -De pakketten worden doorgestuurd naar de mobile node, die niet weet dat dit pakket getunneld was en het als eender welk ander pakket behandelt.
+
+2) Testen van de features
 ============================
-  -Correcte registration requests met vast ingestelde velden worden verstuurd en ontvangen. Registration replies met velden afhankelijk van ontvangen requests worden verstuurd en ontvangen. De agents en mobile node nemen aan dat de requests en replies valid zijn, en passen de berichten correct aan.
 
-  -In Mobile Node, Foreign Agent en Home Agent worden respectievelijk een pending registration list, visitor list en mobile binding list bijgehouden. Deze worden correct ingevuld en aangepast afhankelijk van ontvangen registration requests en replies (behalve remaining lifetime)
-
-  -Registration requests worden getriggerd door een timer (gezien er nog geen advertisements verstuurd worden). Als de timing van de mobility emulator aangepast wordt, moet deze timer ook aangepast worden. Door het gebrek aan advertisements, wordt de routing table nu nog handmatig aangepast voor het verzenden van een request. Eens advertisements geïmplementeerd zijn, kan de informatie hieruit gebruikt worden en zal de routing table van de mobile node pas bij het ontvangen van een reply aangepast worden.
-
-  -Indien de home agent te tunnelen packets ontvangt, wordt dit correct gedaan en detunnelt de ontvangende foreign agent ze correct. Ze worden ook correct naar de mobile node doorgestuurd.
-
-  -Alle checksums (IP en UDP) zijn correct, gecontroleerd met Wireshark.
-
-  -De pings van ipnetwork.click worden in beide situaties (mobile node al dan niet home) beantwoord.
-
-2) Nog te implementeren features
-================================
-  -Alles wat vermeld staat bij "eindevalutie" in de opgave: het versturen en afhandelen van advertisements, het aftellen van de remaining lifetime en gevolgen (verwijderen van entries, registratie herhalen), dynamische registraties.
+TODO
 
 3) Enkele opmerkingen bij de code
 =================================
--We gebruiken momenteel de C++ standard library, indien nodig kunnen we dat nog veranderen naar de Click standard library
-
 -De code is getest en werkend bevonden op een cleane install van Click op het referentieplatform.
 
 -Click waarschuwt voor expensive packet::push, dit kan opgelost worden door in include/click/packet.hh de default_headroom aan te passen van 28 naar (bijvoorbeeld) 48. De default_headroom van 28 wordt gebruikt door de ICMPPingSource, maar dit is niet voldoende voor een tweede IP header (voor tunneling) en een Ethernet header. Indien dit niet aangepast wordt, zal de code nog steeds werken maar een waarschuwing geven.
-
--Door het toevoegen van features aan elementen zijn sommige elementen wat groter dan voorzien geworden, met wat veel inputs en outputs. Om dit wat te verduidelijken, hebben we boven de pushfunctie van elk element een lijstje geplaatst met wat in elke input verwacht wordt, wat ermee gebeurt en wat uit de outputs komt. We zijn nog van plan om de elementen nog wat duidelijker/eenvoudiger te maken (en evt. verder op te splitsen) tegen de eindevaluatie. Op sommige plekken kunnen features van eigen elementen nog vervangen worden door ingebouwde elementen, en het gebruik van handlers (zie volgend punt) zou ook nog wat dingen makkelijker moeten maken.
-
--We zijn pas naar het einde van het ontwikkelen van de tussentijdse versie het gebruik van handlers beginnen overwegen, heel wat code zou dus vereenvoudigd kunnen worden door het gebruik van handlers, we plannen dit te doen tegen de eindevaluatie.
 
 -Er is heel wat output voorzien in de elementen om te volgen wat er precies aan het gebeuren is. Standaard staat de output uitgecomment. Om de output makkelijk aan- en uit te zetten, zijn de scriptjes addoutput en removeoutput voorzien. Wees voorzichtig bij het runnen van de scripts; als het removescript meerdere keren na elkaar gerund wordt, zal het addscript ook meerdere keren moeten worden gerund om de output terug te krijgen! De scripts werken enkel als ze in elements/local/ gerund worden. Deze output, in combinatie met de voorziene dumps zou moeten volstaan om de werking van onze code aan te tonen.
 
