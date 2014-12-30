@@ -9,10 +9,11 @@ $addr_info, $gateway
 |
 
   udpipenc :: UDPIPEncap($addr_info:ip, 1234, 192.168.3.254, 434)
+  request :: RegistrationRequestSender(HOMEADDRESS 192.168.2.1, HOMEAGENT 192.168.2.254);
+  
 
 	// Shared IP input path and routing table
 	ip :: Strip(14)
-	//-> IPPrint("test")
 	-> CheckIPHeader
 	-> rt :: LinearIPLookup(
 		$addr_info:ip/32 0,
@@ -33,21 +34,18 @@ $addr_info, $gateway
 	arpt[0] -> [1]arpq0;
 	c0[2] -> Paint(1) -> ip;
 
-  //Generate registration requests (for now on a timer)
-  request :: RegistrationRequestSender(HOMEADDRESS 192.168.2.1, HOMEAGENT 192.168.2.254);
-  request[0]
-  //Set the destination address for Requests (later via Advertisements, now this way)
+  request[0] //Only outputs newly generated Registration Requests
+  //Modify udpipenc to that it sets IP dst addresses to that of the Agent trying to register to
   -> Script (TYPE PACKET, set dstaddr $(request.gateway), write udpipenc.dst $dstaddr)  
-  //Already set the new default gateway (needed because no Advertisements, should actually be done after getting Reply)
+  //Set the default gateway (to properly route the Request)
   -> Script(TYPE PACKET, set gw $(request.gateway), write rt.remove 0.0.0.0/0.0.0.0, write rt.add 0.0.0.0/0.0.0.0 $gw 1)
   -> udpipenc
   -> rt
 		
 	// Local delivery
 	rt[0] ->
-  //Check if Reply, and process it if so
   Unstrip(14) ->
-  [0]request[1] ->
+  [0]request[1] -> //RegistrationRequestSender will receive and process advertisements and replies here (this output is for all but Requests)
   Strip(14) ->
   //Change the routing table according to new Reply (will leave it unchanged if it was not a Reply)
   Script(TYPE PACKET, set gw $(request.gateway), write rt.remove 0.0.0.0/0.0.0.0, write rt.add 0.0.0.0/0.0.0.0 $gw 1) ->

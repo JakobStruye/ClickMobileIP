@@ -47,14 +47,11 @@ $private_address, $public_address, $default_gateway
 	c1[2] -> Paint(2) -> ip;
 	
 	// Local delivery
-  //Add MobilityBinding (assume correct request)
-	rt[0] -> [0]mob[0] 
-  //Create reply
-  -> [0]reqtorep[0]
-  -> [1]mob[1]
+	rt[0] -> [0]mob[0]  //Generates MobilityBinding entry in case of Registration Request
+  -> [0]reqtorep[0]   //Creates Reply to received Request
+  -> [1]mob[1]        //Remove MobilityBinding entry if Reply indicates Request was denied
   -> UDPIPEncap(1.1.1.1, 1, 2.2.2.2, 2) //All values placeholder
-  //Set IP addresses and UDP ports
-  -> [1]reqtorep[1]
+  -> [1]reqtorep[1]  //Set IP addresses and UDP ports
   -> GetIPAddress(IP dst)
   -> SetUDPChecksum
   -> SetIPChecksum
@@ -63,26 +60,24 @@ $private_address, $public_address, $default_gateway
   //Packet to be tunneled
   mob[2]
   -> IPEncap(ipip, 3.3.3.3, 4.4.4.4) //All values placeholder
-  //Check against routing loops and set tos, continue here if no loop danger
-  -> enc[0]
-  //Set outer IP addresses
-  -> [3]mob[4] 
+  -> enc[0] //Checks for potential routing loops (this output is for safe packets)
+  -> [3]mob[4]   //Set outer IP addresses
   -> GetIPAddress(IP dst) -> SetIPChecksum -> rt;
 
   //Tunneling this would cause loops, send to output 2 to be discarded
   enc[1] -> [2]output;
 
+  //Automatically generated advertisements
   advertise
-  -> IPEncap(1, $private_address:ip, 255.255.255.255, TTL 1)
+  -> IPEncap(1, $private_address:ip, 255.255.255.255, TTL 1) //Broadcast
   -> SetIPChecksum
-  -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)
+  -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF) //Broadcast
   -> [0]output;	
 
 	
 	// Forwarding path for eth0
 	rt[1] 
-  //Send through MobilityBindingList, will continue here if not to be tunneled
-  -> [2]mob[3]
+  -> [2]mob[3] //Check if packet should be tunneled (packets on this output are not to be tunneled)
   -> DropBroadcasts
 	-> cp0 :: PaintTee(1)
 	-> gio0 :: IPGWOptions($private_address)

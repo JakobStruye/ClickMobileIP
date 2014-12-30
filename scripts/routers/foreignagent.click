@@ -36,8 +36,7 @@ $private_address, $public_address, $default_gateway
 	c0[1] -> arpt;
 	arpt[0] -> [1]arpq0;
 	c0[2] 
-  //Fill in Visitor List (if registration, will be checked)
-  -> [0]vis[0] 
+  -> [0]vis[0]  //Will add VisitorList entry in case of Request
   -> Paint(1) -> ip;
 	
 	// Input and output paths for eth1
@@ -55,13 +54,11 @@ $private_address, $public_address, $default_gateway
 
   //Tunneled packets
   findencap[0]
-  -> Strip(20) //outer IP header
+  -> Strip(20) //strip outer IP header
   -> CheckIPHeader
   -> DecIPTTL
-  //Placeholder dst
-  -> EtherEncap(0x0800, $private_address:ether, 2:2:2:2:2:2)
-  //set ethernet dst
-  -> [2]vis[2]
+  -> EtherEncap(0x0800, $private_address:ether, 2:2:2:2:2:2)   //Placeholder dst address
+  -> [2]vis[2]   //Sets ethernet dst
   -> [0]output;
 
   //Not a tunneled packet
@@ -80,10 +77,8 @@ $private_address, $public_address, $default_gateway
 	-> FixIPSrc($public_address)
 	-> dtReply :: DecIPTTL
 	-> frReply :: IPFragmenter(1500)
-  //dst address placeholder
-  -> EtherEncap(0x0800, $private_address:ether, 1:1:1:1:1:1)
-  //Set Ethernet dst, UDP src/dst, UDP ports
-  -> [1]vis[1] 
+  -> EtherEncap(0x0800, $private_address:ether, 1:1:1:1:1:1) //Placeholder dst address
+  -> [1]vis[1]    //Set Ethernet dst, UDP src/dst, UDP ports
   -> Strip(14)
   -> SetIPChecksum
   -> SetUDPChecksum
@@ -93,18 +88,18 @@ $private_address, $public_address, $default_gateway
   //Fixes error of nonexistent output
   Idle -> [2]output
 
+  //Automatically generated advertisements
   advertise
-  -> IPEncap(1, $private_address:ip, 255.255.255.255, TTL 1)
+  -> IPEncap(1, $private_address:ip, 255.255.255.255, TTL 1) //Broadcast
   -> SetIPChecksum
-  -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)
+  -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF) //Broadcast
   -> [0]output;	
 
-  //Forwarding replies (requests denied) generated here
+  //Forwarding replies (if request denied) generated here
   forreq[1]
   -> UDPIPEncap($private_address:ip, 434, 2.2.2.2, 434) //All values placeholder
-  -> EtherEncap(0x0800, $private_address:ether, 1:1:1:1:1:1)
-  //Set Ethernet dst, UDP src/dst, UDP ports
-  -> [1]vis
+  -> EtherEncap(0x0800, $private_address:ether, 1:1:1:1:1:1) //Placeholder dst address
+  -> [1]vis   //Set Ethernet dst, UDP src/dst, UDP ports
 
 
 	// Forwarding path for eth0
