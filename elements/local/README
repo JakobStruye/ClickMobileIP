@@ -104,7 +104,7 @@ Om de normale werking te testen, wordt een uitgebreide versie van het opgegeven 
 
   Testen van error codes in Registration Replies
   ----------------------------------------------
-    -Lijnen code zijn in commentaar toegevoegd aan RegistrationRequestSender.makePacket(), HomeRequestProcess.makeReply() om dit te testen. Er moet telkens 1 lijn ingeschakeld worden om een error code (of silent discard) te activeren. Ook kan een SetUDPChecksum uit de scripts verwijderd worden om een silent discard te activeren.
+    -Lijnen code zijn in commentaar toegevoegd aan RegistrationRequestSender.makePacket() en  HomeRequestProcess.makeReply() om dit te testen. Er moet telkens 1 lijn ingeschakeld worden om een error code (of silent discard) te activeren. Ook kan een SetUDPChecksum uit de scripts verwijderd worden om een silent discard te activeren.
 
   Sequence number rollover
   ------------------------
