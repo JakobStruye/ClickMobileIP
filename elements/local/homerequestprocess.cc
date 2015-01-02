@@ -48,7 +48,7 @@ bool HomeRequestProcess::contains(String IP) {
  */
 WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req, int errcode) {
     //Set lifetime to minimum of requested and max offered lifetime
-    int lifetime = req->lifetime;
+    int lifetime = ntohs(req->lifetime);
     if (lifetime > _lifetime)
         lifetime = _lifetime;
 
@@ -60,11 +60,12 @@ WritablePacket* HomeRequestProcess::makeReply(RegistrationRequest* req, int errc
     RegistrationReply* format = (RegistrationReply*) packet->data();
     format->type = 3; //fixed
     format->code = errcode; //fixed
-    format->lifetime = lifetime;
+    format->lifetime = htons(lifetime);
     format->home_address = req->home_address;
     format->home_agent = req->home_agent;
     format->identification[0] = req->identification[0];
     format->identification[1] = req->identification[1];
+    //format->identification[1] = 0; //FOR TESTING PURPOSES ONLY: Sets invalid identification
     return packet;
 }
 /**

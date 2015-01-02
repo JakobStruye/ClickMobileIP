@@ -8,12 +8,11 @@ elementclass ForeignAgent
 $private_address, $public_address, $default_gateway
 |
   vis :: VisitorList(IP $private_address);
-  advertise :: AgentAdvertisementSender(IP 192.168.3.254, HOME 0, FOREIGN 1, RLIFETIME 15, LIFETIME 4, INTERVAL 3000);
+  advertise :: AgentAdvertisementSender(IP 192.168.3.254, HOME 0, FOREIGN 1, RLIFETIME 300, LIFETIME 4, INTERVAL 3000);
   forreq :: ForeignRequestProcess();
 
   Script(write forreq.addOwnIP IP $private_address:ip)
   Script(write forreq.addOwnIP IP $public_address:ip)
-  //Script(write forreq.addOwnIP IP 192.168.3.254)
 
 
 	// Shared IP input path and routing table

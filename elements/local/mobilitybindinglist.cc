@@ -68,7 +68,6 @@ void MobilityBindingList::deleteEntry(MobilityBindingListEntry* entry) {
     while (it != mobilityList.end()) {
         if (*it == entry) {
             mobilityList.erase(it);
-            //TODO verify if unallocating here is safe
             delete entry;
             break;
         }

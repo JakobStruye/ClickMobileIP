@@ -125,7 +125,10 @@ void VisitorList::push(int input, Packet *p){
     if (input == 2) {
         click_chatter("Foreign Agent: Detunneled packet received");
         VisitorListEntry* entry = getEntry(ip_header->ip_dst);
-
+        if (!entry or !(entry->active)) {
+            click_chatter("Foreign Agent: No (active) visitor list entry found for detunneled packet, discarded");
+            return;
+        }
         for(int i = 0; i < 6; i++) //Set dst ethnet address and deliver on local datalink
             eth_header->ether_dhost[i] = entry->mobile_MAC[i];
         click_chatter("Foreign Agent: dst MAC of detunneled packet set");
@@ -162,6 +165,7 @@ void VisitorList::push(int input, Packet *p){
         entry->identification[1] = ntohl(req->identification[1]);
         entry->lifetime = ntohs(req->lifetime);
         entry->remaining_lifetime = ntohs(req->lifetime);
+        entry->active = false;
 
         insertEntry(entry);
         click_chatter("Foreign Agent: Visitor List entry created for Registration Request");
@@ -174,6 +178,7 @@ void VisitorList::push(int input, Packet *p){
         //Reply not recognized, silently discard
         if (!entry)
             return;
+        entry->active = true; //Activate entry (will now be used to deliver detunneled packets)
         //Set saved lifetime to minimum of that lifetime and lifetime in reply
         if (entry->lifetime > ntohs(reply->lifetime))
           entry->lifetime = ntohs(reply->lifetime);

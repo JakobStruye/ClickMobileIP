@@ -11,12 +11,6 @@ RegistrationRequestSender::RegistrationRequestSender() :
     _remaining_lifetime = 0; //Indicates not currently registered
 
     _care_of_address = IPAddress("0.0.0.0").in_addr(); //placeholder
-    //Both parts of identification start off as uint32_t representation of home address
-    //lower always decrements, upper increments
-    //It should result in unique identifications, and more complicated methods are unneeded
-    //as no security is implemented
-    _lowerIdentification = IPAddress(_home_address).addr();
-    _upperIdentification = IPAddress(_home_address).addr();
 }
 
 RegistrationRequestSender::~RegistrationRequestSender() {
@@ -31,6 +25,15 @@ int RegistrationRequestSender::configure(Vector<String> &conf,
         return -1;
     _home_agent = homeagent.in_addr();
     _home_address = homeaddr.in_addr();
+
+    //Both parts of identification start off as uint32_t representation of home address
+    //lower always decrements, upper increments
+    //It should result in unique identifications, and more complicated methods are unneeded
+    //as no security is implemented
+
+    _lowerIdentification = IPAddress(_home_address).addr();
+    _upperIdentification = IPAddress(_home_address).addr();
+
     return 0;
 }
 
@@ -122,9 +125,12 @@ Packet* RegistrationRequestSender::makePacket(in_addr care_of, int lifetime) {
     RegistrationRequest* format = (RegistrationRequest*) packet->data();
     format->type = 1; //fixed
     format->flags = 0; //all flags 0
+    //format->flags = 4; //FOR TESTING PURPOSES ONLY: Registration bit 1
+    //format->flags = 32; //FOR TESTING PURPOSES ONLY: Request special encapsulation
     format->lifetime = htons(lifetime);
     format->home_address = _home_address;
     format->home_agent = _home_agent;
+    //format->home_agent = IPAddress("192.168.3.254").in_addr(); //FOR TESTING PURPOSES ONLY: Sets home_agent to foreign agent address
     format->care_of_address = care_of;
     format->identification[0] = htonl(_upperIdentification);
     format->identification[1] = htonl(_lowerIdentification);
@@ -180,9 +186,9 @@ void RegistrationRequestSender::push(int, Packet *p) {
                 gateway = IPAddress(entry->dst);
                 _isRegistered = true;
                 _hasReregistered = false;
+                //_hasReregistered = true; //FOR TESTING PURPOSES ONLY: Also set RLIFETIME to low value in script to see what happens w/o reregistration
                 _care_of_address = entry->care_of_address;
-                _remaining_lifetime = entry->remaining_lifetime
-                        - (entry->lifetime - ntohs(rep->lifetime));
+                _remaining_lifetime = entry->remaining_lifetime - (entry->lifetime - ntohs(rep->lifetime));
                 deleteRegistration(entry);
                 click_chatter("Mobile Node: Registration Reply received (Request accepted)");
                 break;
@@ -303,7 +309,7 @@ return;
  */
 void RegistrationRequestSender::run_timer(Timer *) {
 
-    //Decrease remaining lifetime of pending registratoins, remove if 0
+    //Decrease remaining lifetime of pending registrations, remove if 0
     Vector<PendingRegistration*>::iterator it = _pendingRegistrations.begin();
     while (it != _pendingRegistrations.end()) {
         (*it)->remaining_lifetime--;

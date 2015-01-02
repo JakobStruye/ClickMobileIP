@@ -51,12 +51,80 @@ Eindevaluatie
     -Verder worden ze nog door de VisitorList gestuurd om het MAC destination address correct in te vullen
     -De pakketten worden doorgestuurd naar de mobile node, die niet weet dat dit pakket getunneld was en het als eender welk ander pakket behandelt.
 
-2) Testen van de features
+2) Configuraties van elementen
+==============================
+
+Sommige elementen moeten worden geconfigureerd in scripts. Alle argumenten van de configuratie zijn verplicht.
+
+  A) AgentAdvertisementSender
+  ---------------------------
+    IP: (IPAddress) het IP-adres te gebruiken in de Advertisement
+    HOME: (boolean) 1 als de Agent een Home Agent is
+    FOREIGN: (boolean) 1 als de Agent een Foreign Agent is
+    RLIFETIME: (integer) De registration lifetime (in seconden) te gebruiken in de Advertisement
+    LIFETIME: (integer) De lifetime (in seconden) te gebruiken in de Advertisement
+    INTERVAL: Het interval (in milliseconden) tussen twee Advertisements
+
+  B) VisitorList
+  --------------
+    IP: (IPAddress) het IP-adres van de Foreign Agent
+
+  C) HomeRequestProcess
+  ---------------------
+    LIFETIME: (integer) De maximaal toegelaten lifetime door de Home Agent
+
+  D) Encapsulator
+  ---------------
+    SRC: (IPAddress) Het IP-adres van de Home Agent
+
+  E) RegistrationRequestSender
+  ----------------------------
+    HOMEADDRESS: (IPAddress) Het Home Address te gebruiken in Registration Requests
+    HOMEAGENT: (IPAddress) Het Home Agent Address te gebruiken in Registration Requests
+
+Verder zijn er ook sommige elementen met handlers
+
+  F) ForeignRequestProcess
+  ------------------------
+    -write addOwnIP IP: (IPAddress) Voegt een IP-adres van de Foreign Agent toe aan het element
+
+  G) HomeRequestRequestProcess
+  ------------------------
+    -write addHomeAgent IP: (IPAddress) Voegt een IP-adres van de Home Agent toe aan het element
+
+  H) RegistrationRequestSender
+  ----------------------------
+    -read gateway: Geeft het IP-adres van de Agent waarbij de Mobile Node geregistreerd is, te gebruiken als gateway.
+  
+
+3) Testen van de features
 ============================
 
-TODO
+Om de normale werking te testen, wordt een uitgebreide versie van het opgegeven script gebruikt. Voor het testen van specifieke functionaliteit dient telkens een kleine aanpassing aan scripts en/of broncode (+hercompilatie) aangebracht te worden. De vereiste aanpassingen worden hier opgelijst. Zo vermijden we een hele waslijst aan verschillende configuraties van broncode in het project, enkel voor tests. Op deze manier weet de tester ook goed wat hij precies aan het testen is; het doel van deze tests is om de aanwezigheid van specifieke functionaliteit te verifiëren en niet om snel te zien of geen test cases foutlopen.
 
-3) Enkele opmerkingen bij de code
+  Testen van error codes in Registration Replies
+  ----------------------------------------------
+    -Lijnen code zijn in commentaar toegevoegd aan RegistrationRequestSender.makePacket(), HomeRequestProcess.makeReply() om dit te testen. Er moet telkens 1 lijn ingeschakeld worden om een error code (of silent discard) te activeren. Ook kan een SetUDPChecksum uit de scripts verwijderd worden om een silent discard te activeren.
+
+  Sequence number rollover
+  ------------------------
+    -Er zijn drie lijnen code voorzien in AgentAdvertisementSender.run_timer() die deze situatie veroorzaken; om de seconde wordt een Agent reset gedetecteerd via de sequence numers en wordt opnieuw geregistreerd.
+
+  Registratie timeout
+  -------------------
+    -Om reregistratie door lage remaining lifetime te testen, dient de geadverteerde registration lifetime (argument RLIFETIME) in de Foreign en Home Agent scripts op een lage waarde (bv. 12) ingesteld te worden. Reregistratie wordt gestart van zodra de remaining lifetime onder de 10 seconden gaat.
+    -Om effectieve timeout te testen, dient reregistatie geblokkeerd te worden. Hiervoor is 1 lijn code voorzien in RegistrationRequestSender.push() (_hasReregistered = true)
+
+  Move detection
+  --------------
+    -Move detection gebeurt adhv het algoritme in de RFC: wanneer geen advertisements meer ontvangen worden van de bij geregistreerde host, wordt aangenomen dat de mobile node zich heeft verplaatst. Er wordt meteen geregistreerd bij een andere Agent als er al andere Advertisements ontvangen zijn, of anders wordt op andere advertisements gewacht. Beide gevallen komen voor in de standaardtest. 
+
+    -Om te testen wat zou gebeuren moesten Advertisements verloren gaan, kan de lifetime van de Advertisements (argument LIFETIME) lager dan het interval (argumentINTERVAL, milliseconden) ingesteld worden (bv 2 en 5000). Omdat de lifetime van de registratie zelf hier niet verstreken wordt, blijven de Home en Foreign Agent de registratie als geldig beschouwen en blijft de Mobile Node pakketten ontvangen totdat andere Advertisements toekomen.
+
+    -Om te testen wat zou gebeuren moest geen movement gedetecteerd worden, kan de lifetime (arugment LIFETIME) van de Agents erg hoog ingesteld worden (bv. 300). De Mobile Node zal geen movement detecteren en bij de Foreign Agent geregistreerd blijven.
+
+
+4) Enkele opmerkingen bij de code
 =================================
 -De code is getest en werkend bevonden op een cleane install van Click op het referentieplatform.
 

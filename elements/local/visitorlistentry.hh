@@ -13,6 +13,7 @@ struct VisitorListEntry {
     uint32_t identification[2];
     uint16_t lifetime;
     uint16_t remaining_lifetime;
+    bool active;
 };
 
 

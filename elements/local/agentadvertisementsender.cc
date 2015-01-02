@@ -84,8 +84,15 @@ void AgentAdvertisementSender::run_timer(Timer *) {
             _seq_number = 256;
         else
             _seq_number++;
+
+        //_interval = 500;  //FOR TESTING PURPOSES ONLY: Tests reregistration on Agent reset detected through sequence numbers
+        //if (_seq_number > 1)
+        //    _seq_number = 0;
+
+
+
     }
-    _timer.reschedule_after_msec(3000);
+    _timer.reschedule_after_msec(_interval);
 }
 
 CLICK_ENDDECLS

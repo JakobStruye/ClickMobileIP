@@ -12,7 +12,7 @@ $private_address, $public_address, $default_gateway
   mob :: MobilityBindingList()
   reqtorep :: HomeRequestProcess(LIFETIME 300);
   enc :: Encapsulator(SRC $private_address:ip);
-  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0, RLIFETIME 15, LIFETIME 4, INTERVAL 3000);
+  advertise :: AgentAdvertisementSender(IP 192.168.2.254, HOME 1, FOREIGN 0, RLIFETIME 300, LIFETIME 4, INTERVAL 3000);
   
   Script(write reqtorep.addHomeAgent IP 192.168.2.254);
 
