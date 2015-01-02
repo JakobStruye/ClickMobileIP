@@ -189,8 +189,9 @@ void VisitorList::push(int input, Packet *p){
         ip_header->ip_dst = entry->ip_src;
         udp_header->uh_sport = htons(434);
         udp_header->uh_dport = htons(entry->port_src);
-        if (reply->code == 1)
+        if (reply->code == 1) {
             click_chatter("Foreign Agent: Visitor List updated after receiving Registration Reply (accepted)");
+        }
         else {
             click_chatter("Foreign Agent: Visitor List updated after receiving Registration Reply (denied)");
             deleteEntry(entry);

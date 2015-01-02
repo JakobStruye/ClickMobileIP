@@ -5,3 +5,4 @@ sed -i 's/click_chatter/\/\/click_chatter/g' homerequestprocess.cc
 sed -i 's/click_chatter/\/\/click_chatter/g' mobilitybindinglist.cc
 sed -i 's/click_chatter/\/\/click_chatter/g' registrationrequestsender.cc
 sed -i 's/click_chatter/\/\/click_chatter/g' visitorlist.cc
+sed -i 's/click_chatter/\/\/click_chatter/g' agentadvertisementsender.cc

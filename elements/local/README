@@ -63,7 +63,7 @@ Sommige elementen moeten worden geconfigureerd in scripts. Alle argumenten van d
     FOREIGN: (boolean) 1 als de Agent een Foreign Agent is
     RLIFETIME: (integer) De registration lifetime (in seconden) te gebruiken in de Advertisement
     LIFETIME: (integer) De lifetime (in seconden) te gebruiken in de Advertisement
-    INTERVAL: Het interval (in milliseconden) tussen twee Advertisements
+    INTERVAL: (integer) Het interval (in milliseconden) tussen twee Advertisements
 
   B) VisitorList
   --------------
@@ -100,11 +100,11 @@ Verder zijn er ook sommige elementen met handlers
 3) Testen van de features
 ============================
 
-Om de normale werking te testen, wordt een uitgebreide versie van het opgegeven script gebruikt. Voor het testen van specifieke functionaliteit dient telkens een kleine aanpassing aan scripts en/of broncode (+hercompilatie) aangebracht te worden. De vereiste aanpassingen worden hier opgelijst. Zo vermijden we een hele waslijst aan verschillende configuraties van broncode in het project, enkel voor tests. Op deze manier weet de tester ook goed wat hij precies aan het testen is; het doel van deze tests is om de aanwezigheid van specifieke functionaliteit te verifiëren en niet om snel te zien of geen test cases foutlopen.
+Om de normale werking te testen, wordt een uitgebreide versie van het opgegeven script gebruikt, te vinden in scripts/. Voor het testen van specifieke functionaliteit dient telkens een kleine aanpassing aan scripts en/of broncode (+hercompilatie) aangebracht te worden. De vereiste aanpassingen worden hier opgelijst. Zo vermijden we een hele waslijst aan verschillende configuraties van broncode in het project, enkel voor tests. Op deze manier weet de tester ook goed wat hij precies aan het testen is; het doel van deze tests is om de aanwezigheid van specifieke functionaliteit te verifiëren en niet om snel te zien of geen test cases foutlopen.
 
   Testen van error codes in Registration Replies
   ----------------------------------------------
-    -Lijnen code zijn in commentaar toegevoegd aan RegistrationRequestSender.makePacket() en  HomeRequestProcess.makeReply() om dit te testen. Er moet telkens 1 lijn ingeschakeld worden om een error code (of silent discard) te activeren. Ook kan een SetUDPChecksum uit de scripts verwijderd worden om een silent discard te activeren.
+    -Lijnen code zijn in commentaar toegevoegd aan RegistrationRequestSender.makePacket() en HomeRequestProcess.makeReply() om dit te testen. Er moet telkens 1 lijn ingeschakeld worden om een error code (of silent discard) te activeren. Ook kan een SetUDPChecksum uit de scripts verwijderd worden om een silent discard te activeren.
 
   Sequence number rollover
   ------------------------
